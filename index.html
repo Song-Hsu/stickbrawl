@@ -42,9 +42,10 @@ function srand(seed){return()=>{seed=(seed*16807)%2147483647;return seed/2147483
 let AUTO=false;try{AUTO=/auto/.test(location.hash);}catch(e){}
 
 /* ---------- sizing + cached layers ---------- */
-let scale=1,ox=0,oy=0,dpr=1,KQ=1,BGL=null,portrait=false,EX=0;
-function resize(){dpr=Math.min(window.devicePixelRatio||1,2);const w=cv.clientWidth||VW,h=cv.clientHeight||VH;cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);scale=Math.min(w/VW,h/VH);ox=(w-VW*scale)/2;oy=(h-VH*scale)/2;EX=Math.max(0,ox/scale);KQ=Math.min(2.5,dpr*scale);portrait=h>w*1.05;buildBG();}
-window.addEventListener('resize',resize);
+let scale=1,ox=0,oy=0,dpr=1,KQ=1,BGL=null,portrait=false,EX=0,ROT=false,ROTW=0;const TOUCHDEV=('ontouchstart' in window)||navigator.maxTouchPoints>0;
+function resize(){dpr=Math.min(window.devicePixelRatio||1,2);const CW=cv.clientWidth||VW,CH=cv.clientHeight||VH;ROT=TOUCHDEV&&CH>CW*1.05;ROTW=CW;
+ const w=ROT?CH:CW,h=ROT?CW:CH;cv.width=Math.round(CW*dpr);cv.height=Math.round(CH*dpr);scale=Math.min(w/VW,h/VH);ox=(w-VW*scale)/2;oy=(h-VH*scale)/2;EX=Math.max(0,ox/scale);KQ=Math.min(2.5,dpr*scale);portrait=h>w*1.05;buildBG();}
+window.addEventListener('resize',resize);window.addEventListener('orientationchange',()=>setTimeout(resize,250));
 const GS={};
 function gsprite(col){if(GS[col])return GS[col];const c=document.createElement('canvas');c.width=c.height=64;const g=c.getContext('2d');const gr=g.createRadialGradient(32,32,0,32,32,32);gr.addColorStop(0,rgba(col,1));gr.addColorStop(.22,rgba(col,.6));gr.addColorStop(1,rgba(col,0));g.fillStyle=gr;g.fillRect(0,0,64,64);return GS[col]=c;}
 function glow(x,y,r,col,a){if(a<=.01||r<=.5)return;ctx.globalAlpha=Math.min(1,a);ctx.drawImage(gsprite(col),x-r,y-r,r*2,r*2);}
@@ -478,7 +479,7 @@ window.addEventListener('keydown',e=>{const k=e.key.toLowerCase();if(['arrowup',
  if(k==='escape'&&G.state==='fight'){if(G.mode==='practice')G.state='menu';else if(!G.ko)G.paused=!G.paused;}});
 window.addEventListener('keyup',e=>{K[e.key.toLowerCase()]=false;});
 window.addEventListener('blur',()=>{for(const k in K)K[k]=false;});
-function toV(ev){const r=cv.getBoundingClientRect();return[(ev.clientX-r.left-ox)/scale,(ev.clientY-r.top-oy)/scale];}
+function toV(ev){if(ROT){const r=cv.getBoundingClientRect(),lx=ev.clientY-r.top,ly=ROTW-(ev.clientX-r.left);return[(lx-ox)/scale,(ly-oy)/scale];}const r=cv.getBoundingClientRect();return[(ev.clientX-r.left-ox)/scale,(ev.clientY-r.top-oy)/scale];}
 const inR=(x,y,b)=>x>=b[0]&&x<=b[0]+b[2]&&y>=b[1]&&y<=b[1]+b[3];
 const R_MUTE=[466,60,30,24],R_MUTE_M=[906,18,36,26];
 const M_BTNS={start:[600,150,320,66],prac:[600,226,320,50],school:[600,286,320,50],train:[600,346,156,46],ladder:[764,346,156,46]};
@@ -1967,7 +1968,7 @@ function drawAd(){ctx.fillStyle='rgba(8,5,4,.9)';ctx.fillRect(-EX,0,VW+2*EX,VH);
 function drawPortrait(){ctx.fillStyle='rgba(8,5,4,.92)';ctx.fillRect(-EX,0,VW+2*EX,VH);txt('把手机横过来玩',VW/2,220,64,C.gold,'center',DF,6);txt('横屏才看得到完整的决斗画面 · 点任意处继续',VW/2,300,22,C.chalk,'center',BF,4);}
 
 function render(){ctx.setTransform(1,0,0,1,0,0);ctx.fillStyle=C.bg;ctx.fillRect(0,0,cv.width,cv.height);
- ctx.setTransform(dpr*scale,0,0,dpr*scale,dpr*ox,dpr*oy);ctx.save();ctx.beginPath();ctx.rect(-EX,0,VW+2*EX,VH);ctx.clip();
+ (ROT?ctx.setTransform(0,dpr*scale,-dpr*scale,0,dpr*(ROTW-oy),dpr*ox):ctx.setTransform(dpr*scale,0,0,dpr*scale,dpr*ox,dpr*oy));ctx.save();ctx.beginPath();ctx.rect(-EX,0,VW+2*EX,VH);ctx.clip();
  if(G.state==='menu')drawMenu();
  else if(G.state==='ladder')drawLadder();else if(G.state==='school')drawSchool();else if(G.state==='train')drawTrain();
  else{drawScene([PL,EN]);if(G.state==='fight'){drawCine();drawHUD();drawControls();if(G.paused){ctx.fillStyle='rgba(8,5,4,.78)';ctx.fillRect(-EX,0,VW+2*EX,VH);txt('暂 停',VW/2,150,56,C.chalk,'center',DF,6);button(R_PAUSE.go,'继续战斗',PL.rim,'#140c08',20);ghostBtn(R_PAUSE.home,'回大厅（本场不算）',16);ghostBtn(R_PAUSE.snd,muted?'声音：关':'声音：开',15);}}else if(G.state==='result')drawResult();else if(G.state==='ad')drawAd();}
