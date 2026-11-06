@@ -993,7 +993,7 @@ function swingFx(F,m,sz){const p=m.pose,up=/slashB|rising|airSlashB/.test(p)?1:0
  fxs.push({type:'cres',x:F.x+F.face*m.reach*.38,y,f:F.face,rot,r:m.reach*.62*sz,col:F.el.b,core:F.el.a,t:0,life:m.big?.26:.18});}
 function ichimonji(F,O){const y=-(O.h+34*VS);fxs.push({type:'sline',x:(F.x+O.x)/2,y,t:0,life:.5,col:F.el.a});impact(O.x,y,true);G.freeze=Math.max(G.freeze,.22);G.slow=.5;num((F.x+O.x)/2,y-90,'一 闪',F.el.a,1);for(let i=0;i<24;i++)spark(O.x,y,rand(-.4,.4)+(F.face>0?0:Math.PI),rand(300,800),'#ffffff',rand(.2,.4));}
 
-function startAct(F,key){const m=key==='SP'?F.spMove:key==='WV'?F.waveMove:F.sc.moves[key];if(!m)return false;if(F===PL&&key!=='CH')practiceEv('move',key);if(key==='CH'){F.aiCh=rand(.1,1.1);F.chFull=0;}F.state='act';F.mv=m;F.mvKey=key;F.t=0;F.hitDone=false;F.dived=false;F.spDone=false;F.trail=[];F.plLand=-1;F.hitIdx=0;F.swung=false;F.rbDone=false;F.qiN=0;F.grabbed=false;if(key==='PC')F.parryT=0;
+function startAct(F,key){const m=key==='SP'?F.spMove:key==='WV'?F.waveMove:F.sc.moves[key];if(!m)return false;if(F===PL&&key!=='CH')practiceEv('move',key);if(key==='CH'){F.aiCh=rand(.1,1.1);F.chFull=0;}if(key==='AH')F.ahUsed=true;F.state='act';F.mv=m;F.mvKey=key;F.t=0;F.hitDone=false;F.dived=false;F.spDone=false;F.trail=[];F.plLand=-1;F.hitIdx=0;F.swung=false;F.rbDone=false;F.qiN=0;F.grabbed=false;if(key==='PC')F.parryT=0;
  if(key==='SP'){F.en=0;G.cine={t:1,name:m.name,F};fxs.push({type:'cast',k:F.sc.key,F,t:0,life:1.55,col:F.el.b,core:F.el.a,c:F.el.c});fxs.push({type:'sigil',k:F.sc.key,F,x:F.x,t:0,life:1.7,col:F.el.b,core:F.el.a,c:F.el.c});G.freeze=Math.max(G.freeze,1);sfx('whoosh');sfx(F.el.snd);}
  else if(m.name)G.mv={txt:m.name,t:1,F};
  if(m.plunge){F.vh=Math.max(F.vh,380);F.h=Math.max(F.h,1);}
@@ -1013,7 +1013,7 @@ function tryBuffered(F){if(!F.buf)return;const a=F.buf,st=F.state,ground=F.h<=0,
   else if(RT.chase&&((late&&F.mvKey==='H')||(free&&F.chainT>0&&F.lastKey==='H'))&&ground&&O.state==='fly'&&!O.ko&&O.h>40&&Math.abs(O.x-F.x)<430){chase(F,O);ok=true;}
   else if(free){ok=startAct(F,F.chainT>0&&RT.next[F.lastKey]?RT.next[F.lastKey]:'L1');}
   else if(late&&RT.next[F.mvKey])ok=startAct(F,RT.next[F.mvKey]);}
- else if(a==='heavy'){const RT=F.sc.R||DEF_R;if(F.sc.key==='wudu'&&free&&ground&&(opp(F).poison||0)>=3&&opp(F).poisonT>0)ok=startAct(F,'DT');else if(st==='air'||(late&&F.mv.air))ok=startAct(F,'AH');else if(late&&RT.hv[F.mvKey])ok=startAct(F,RT.hv[F.mvKey]);else if(free)ok=startAct(F,RT.hv._);}
+ else if(a==='heavy'){const RT=F.sc.R||DEF_R;if(F.sc.key==='wudu'&&free&&ground&&(opp(F).poison||0)>=3&&opp(F).poisonT>0)ok=startAct(F,'DT');else if(st==='air'||(late&&F.mv.air)){if(!F.ahUsed)ok=startAct(F,'AH');else ok=true;}else if(late&&RT.hv[F.mvKey])ok=startAct(F,RT.hv[F.mvKey]);else if(free)ok=startAct(F,RT.hv._);}
  else if(a==='special'){if(F.en>=100&&(free||st==='air'))ok=startAct(F,'SP');}
  else if(a==='wave'){if((free||st==='air'||(late&&F.mvKey!=='SP'&&F.mvKey!=='WV'))&&F.waveCd<=0){if(F.en>=20){F.en-=20;F.waveCd=.6;ok=startAct(F,'WV');}else{if(F===PL&&!F.noEnT){num(F.x,-F.h-170,'气不足','#c9b8a8',0);}ok=true;}}}
  if(ok){F.buf=null;F.bufT=0;}}
@@ -1168,7 +1168,7 @@ function fighterUpdate(F,dt){const O=opp(F),I=F.in;F.ph+=dt;ultFxUpdate(F,dt);if
  if(F.para>0){F.para-=dt;if(Math.random()<dt*20)zbolt(F.x+rand(-20,20),-F.h-rand(20,90),F.x+rand(-30,30),-F.h-rand(10,100),.06,.8,'#6cc4ff');}
  if(G.mode==='practice'&&F===PL){if(F.state!=='act')F.en=Math.min(100,F.en+75*dt);F.hp=F.maxHp;}
  if(F.autoPC>0){F.autoPC-=dt;if(F.autoPC<=0&&['idle','walk','block'].includes(F.state)&&F.h<=0){F.state='idle';startAct(F,'PC');num(F.x,-F.h-180,'太极反击!','#e8f6ff',1);}}
- if(F.jyT>0)F.jyT-=dt;if(F.h<=0)F.djUsed=false;
+ if(F.jyT>0)F.jyT-=dt;if(F.h<=0&&!(F.state==='act'&&F.mv&&F.mv.plunge)){F.djUsed=false;F.ahUsed=false;}
  if(G.state==='fight'&&G.intro<=0&&!G.ko&&!F.ko&&G.mode!=='practice')F.en=Math.min(100,F.en+2.5*dt);
  F.flashT=Math.max(0,(F.flashT||0)-dt);F.waveCd=Math.max(0,(F.waveCd||0)-dt);if(F.bufT>0)F.bufT-=dt;else F.buf=null;F.parryT=Math.max(0,F.parryT-dt);
  if(F.state==='block'){F.guard-=7*dt;F.guardCd=.8;if(F.guard<=0){F.guard=8;F.state='recoil';F.t=0;F.stun=.55;num(F.x,-F.h-150,'架势崩溃','#ffb0a0',0);sfx('break');}}else{F.guardCd-=dt;if(F.guardCd<=0&&!(F.poison>0))F.guard=Math.min(100,F.guard+32*dt);}
@@ -1185,7 +1185,7 @@ function fighterUpdate(F,dt){const O=opp(F),I=F.in;F.ph+=dt;ultFxUpdate(F,dt);if
   if(F.buf==='atk'||F.buf==='heavy')tryBuffered(F);if(F.state==='dash'&&F.t>=(F.dashBack?.26:.22)){F.state=F.h>0?'air':'idle';F.dashRecent=.22;if(!F.dashBack&&Math.abs(F.in.mx)>.5)F.runT=1;}break;
  case'act':{F.t+=dt;const m=F.mv;
   if(m.plunge){const sk=F.sc.key,hov=m.hov!=null?m.hov:.2;if(F.t<hov&&F.plLand<0){F.vh=Math.max(F.vh*.85,40);F.vx*=.9;}else if(F.plLand<0){if(!F.dived){F.dived=true;F.vh=sk==='shaolin'?-2300:sk==='emei'?-1400:-1800;if(m.rebound){const T=clamp(F.h/800,.14,.32),tx=clamp((O.x-F.face*20)-F.x,-340,340);F.dvx=tx/T;F.vh=-F.h/T+900*T;}plungeStart(F,m);sfx('whoosh');}F.vx=m.rebound?F.dvx:F.face*(PLV[sk]!=null?PLV[sk]:280);plungeTrail(F);if(sk!=='shaolin')addGhost(F,.2);
-    if(m.rebound&&!F.rbDone&&!O.ko&&O.inv<=0&&(O.x-F.x)*F.face>-30&&(O.x-F.x)*F.face<105&&F.h-O.h<150){F.rbDone=true;resolveHit(F,O,Object.assign({},m,{ky:300,kx:160}),F.face);F.state='air';F.mv=null;F.t=0;F.vh=780;F.vx=-F.face*170;F.djUsed=false;F.autoAL=false;F.trail=[];num(F.x,-F.h-150,'踏燕','#cff4ff',0);for(let i=0;i<8;i++)frost(F.x,-F.h-20,rand(-160,160),rand(-180,40));sfx('ice');break;}}
+    if(m.rebound&&!F.rbDone&&!O.ko&&O.inv<=0&&(O.x-F.x)*F.face>-30&&(O.x-F.x)*F.face<105&&F.h-O.h<150){F.rbDone=true;resolveHit(F,O,Object.assign({},m,{ky:300,kx:160}),F.face);F.state='air';F.mv=null;F.t=0;F.vh=640;F.vx=-F.face*170;F.autoAL=false;F.trail=[];num(F.x,-F.h-150,'踏燕','#cff4ff',0);for(let i=0;i<8;i++)frost(F.x,-F.h-20,rand(-160,160),rand(-180,40));sfx('ice');break;}}
    if(F.plLand<0&&F.h<=0&&F.t>hov){F.plLand=F.t;plungeLand(F,O,m);}
    if(F.plLand>=0&&F.t-F.plLand>.32)endAct(F);break;}
   if(m.sp){F.vx=0;if(F.t<m.act[0])castTick(F,dt);if(!F.spDone&&F.t>=m.act[0]){F.spDone=true;spawnSpecial(F);}if(F.t>=m.dur)endAct(F);break;}
