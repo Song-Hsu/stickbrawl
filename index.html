@@ -1065,6 +1065,7 @@ function resolveHit(A,B,m,dir){if(B.ko)return false;const otg=A.sc.otg&&B.state=
  if(m.crack)addCrack(B.x,90);
  if(B.hp<=0&&EN===B&&G.mode==='practice')B.hp=B.maxHp;
  if(B.hp<=0){B.hp=0;B.mv=null;B.trail=[];KO(A,B,dir,hx,hy);return true;}
+ if(B.state==='act'&&B.mvKey==='SP'&&B.mv&&B.mv.act&&B.t<=B.mv.act[1]+.05){num(B.x,hy-110,'霸 体','#ffd890',0);fxs.push({type:'star',x:B.x,y:hy,t:0,life:.16,r:80,rot:rand(0,1),col:'#ffd890'});shock(B.x,hy,90,'#ffd890',.25,4);applyEl(A,B,m);if(B===PL)G.hurtFlash=.2;return true;}
  if(B.state==='act'&&B.mv&&B.mv.armor&&!m.sp&&!m.launch&&!(m.air&&m.spike)&&!wasFrozen){num(B.x,hy-110,'霸 体','#ffd890',0);fxs.push({type:'star',x:B.x,y:hy,t:0,life:.16,r:80,rot:rand(0,1),col:'#ffd890'});shock(B.x,hy,90,'#ffd890',.25,4);B.vx+=dir*40;applyEl(A,B,m);if(B===PL)G.hurtFlash=.2;return true;}
  if(wasFrozen&&!m.big){B.vx=dir*30;applyEl(A,B,m);return true;}
  if(otg){B.otgUsed=true;B.state='fly';B.t=0;B.bounce=0;B.h=Math.max(B.h,1);B.vh=560;B.vx=dir*140;B.mv=null;B.trail=[];B.inv=0;num(B.x,hy-110,'落井下石!','#ffe08a',1);addCrack(B.x,100);shock(B.x,0,130,A.el.b,.35,5,1);G.shake=Math.max(G.shake,10);applyEl(A,B,m);return true;}
@@ -1994,7 +1995,7 @@ function frame(now){if(Math.abs(cv.clientWidth-CWc)>1||Math.abs(cv.clientHeight-
  else if(G.state==='ad'){G.adT-=rdt;if(G.adT<=0)continueFight();}
  else if(G.state==='menu')updateMenu(rdt);else fx(rdt);
  render();requestAnimationFrame(frame);}
-window.__trs=()=>TRS();window.__dbg={G,SAVE,log:[],get projs(){return projs;},get PL(){return PL;},get EN(){return EN;}};
+window.__trs=()=>TRS();window.__dbg={G,SAVE,log:[],startAct,get projs(){return projs;},get PL(){return PL;},get EN(){return EN;}};
 if(AUTO){setTimeout(()=>startFight(),300);setInterval(()=>{if(G.state==='result'){window.__dbg.log.push({stage:G.result.stage,win:G.result.win,t:Math.round(G.t)});startFight();}},1200);}
 requestAnimationFrame(frame);
 })();
