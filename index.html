@@ -282,7 +282,7 @@ function pose(p,ph){let lean=0,bob=0,low=0,wa=-.75;
  let lf=[-11,0],rf=[11,0],lk=[-7,-9],rk=[11,-10],le=[3,-29],lh=[11,-30],re=[6,-27],rh=[14,-29];
  switch(p){
  case'idle':bob=Math.sin(ph*3)*1;low=2;break;
- case'walk':{const a=Math.sin(ph*10)*9;lf=[-a,0];rf=[a,0];lk=[-a*.5+1,-10];rk=[a*.5+2,-10];bob=-Math.abs(Math.cos(ph*10))*2;lean=3;le=[2-a*.3,-29];lh=[9-a*.4,-27];wa=-.75+Math.sin(ph*10)*.12;break;}
+ case'walk':{const a=Math.sin(ph*10)*9;lf=[-a,0];rf=[a,0];lk=[-a*.5+1,-10];rk=[a*.5+2,-10];bob=-Math.abs(Math.cos(ph*10))*2;lean=3;le=[2-a*.3,-29];lh=[9-a*.4,-27];re=[6+a*.3,-27];rh=[14+a*.45,-29+Math.abs(a)*.15];wa=-.75+Math.sin(ph*10)*.12;break;}
  case'run':{const a=Math.sin(ph*14)*13;lf=[-a,-Math.max(0,-Math.cos(ph*14))*6];rf=[a,-Math.max(0,Math.cos(ph*14))*6];lk=[-a*.4+4,-11];rk=[a*.4+5,-11];bob=-Math.abs(Math.cos(ph*14))*3;lean=13;re=[-2,-28];rh=[-12,-22];le=[-4,-30];lh=[-14,-26];wa=2.7;break;}
  case'backstep':lean=-9;lf=[-14,-3];rf=[6,0];lk=[-9,-12];rk=[8,-10];re=[10,-32];rh=[16,-38];le=[8,-34];lh=[14,-40];wa=-1.2;break;
  case'land':low=11;lean=5;lk=[-6,-6];rk=[10,-7];lf=[-13,0];rf=[13,0];break;
@@ -401,8 +401,23 @@ function pose(p,ph){let lean=0,bob=0,low=0,wa=-.75;
  const H=[H0[0],H0[1]*LG],N=[N0[0],H[1]+(N0[1]-H0[1])*TS],D=[N[0]+(D0[0]-N0[0]),N[1]+(D0[1]-N0[1])*.82];
  const lg=p=>[p[0],p[1]*LG],am=p=>{const q=ad(p);return[N[0]+(q[0]-N0[0])*AR,N[1]+(q[1]-N0[1])*AR];};
  return{wa,H,N,D,lf:lg(lf),rf:lg(rf),lk:lg([lk[0],lk[1]+low*.6]),rk:lg([rk[0],rk[1]+low*.6]),le:am(le),lh:am(lh),re:am(re),rh:am(rh)};}
-function blendTo(o,T,rate,dt){if(!o.J){o.J={};for(const k of JK)o.J[k]=T[k].slice();o.wa=T.wa;return;}const a=1-Math.exp(-rate*dt);for(const k of JK){const j=o.J[k],t=T[k];j[0]+=(t[0]-j[0])*a;j[1]+=(t[1]-j[1])*a;}
- let d=((T.wa-o.wa+Math.PI)%(2*Math.PI)+2*Math.PI)%(2*Math.PI)-Math.PI;o.wa+=d*a;}
+// joints follow their target pose on damped springs (overshoot = follow-through, head lags the chest),
+// then a 2-bone IK pass keeps arm/leg bone lengths so limbs swing in arcs instead of shrinking through the body
+const JW={H:.9,N:1,D:.72,lf:1.25,rf:1.25,lk:1,rk:1,le:.95,lh:1.08,re:.95,rh:1.08};
+function ik2(S,E,Hn,l1,l2){let dx=Hn[0]-S[0],dy=Hn[1]-S[1],d=Math.hypot(dx,dy)||1e-3;const ux=dx/d,uy=dy/d,dc=clamp(d,Math.abs(l1-l2)+.05,l1+l2-.05);
+ if(dc!==d){Hn[0]=S[0]+ux*dc;Hn[1]=S[1]+uy*dc;d=dc;}const a=(l1*l1-l2*l2+d*d)/(2*d),h=Math.sqrt(Math.max(0,l1*l1-a*a)),px=S[0]+ux*a,py=S[1]+uy*a;
+ const s=((E[0]-S[0])*uy-(E[1]-S[1])*ux)>=0?1:-1;E[0]=px+uy*h*s;E[1]=py-ux*h*s;}
+const blen=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]);
+function blendTo(o,T,rate,dt){if(!o.J){o.J={};o.JV={};for(const k of JK){o.J[k]=T[k].slice();o.JV[k]=[0,0];}o.wa=T.wa;return;}
+ if(!o.JV){o.JV={};for(const k of JK)o.JV[k]=[0,0];}
+ const strike=rate>=60,zeta=strike?.5:rate>=35?.62:.78,n=Math.max(1,Math.ceil(rate*.95*dt/.3)),h=dt/n;
+ for(const k of JK){const j=o.J[k],v=o.JV[k],t=T[k],w=rate*.95*JW[k],w2=w*w,c=2*zeta*w;
+  for(let i=0;i<n;i++){v[0]+=(w2*(t[0]-j[0])-c*v[0])*h;v[1]+=(w2*(t[1]-j[1])-c*v[1])*h;j[0]+=v[0]*h;j[1]+=v[1]*h;}}
+ const J=o.J;ik2(J.N,J.le,J.lh,blen(T.N,T.le),blen(T.le,T.lh));ik2(J.N,J.re,J.rh,blen(T.N,T.re),blen(T.re,T.rh));
+ ik2(J.H,J.lk,J.lf,blen(T.H,T.lk),blen(T.lk,T.lf));ik2(J.H,J.rk,J.rf,blen(T.H,T.rk),blen(T.rk,T.rf));
+ const a=1-Math.exp(-rate*dt);let d=((T.wa-o.wa+Math.PI)%(2*Math.PI)+2*Math.PI)%(2*Math.PI)-Math.PI;o.wa+=d*a;}
+function poseKick(F,dir,mag){if(!F.JV)return;const f=dir*F.face,r=()=>rand(-1,1);const K={N:[150,-40],D:[230,-70],H:[60,0],lh:[90+60*r(),-120],rh:[90+60*r(),-120],le:[80,-60],re:[80,-60]};
+ for(const k in K){F.JV[k][0]+=K[k][0]*f*mag;F.JV[k][1]+=K[k][1]*mag;}}
 const wj=(F,k)=>[F.x+F.J[k][0]*VS*F.face,-F.h+F.J[k][1]*VS];
 const LIMB_P={rh:'re',lh:'le',rf:'rk',lf:'lk',N:'H'};
 function curLimb(F){const m=F.state==='act'&&F.mv;if(!m||m.sp)return'rh';if(m.limbs&&m.multi)return m.limbs[Math.min(F.hitIdx,m.multi.length-1)%m.limbs.length];return m.limb||'rh';}
@@ -1054,7 +1069,7 @@ function resolveHit(A,B,m,dir){if(B.ko)return false;const otg=A.sc.otg&&B.state=
   num(B.x+B.face*10,cy-60,'铛','#e8eefc',0);G.freeze=.07;G.shake=Math.max(G.shake,5);sfx('clank');return true;}
  B.taken=(B.taken||0)+1;if(!m.sp)dmg*=Math.max(.45,1-(B.taken-1)*.045);const wasFrozen=B.state==='frozen';if(wasFrozen&&m.big){dmg+=16*A.dmgM;B.state='hurt';shatter(B);}
  const back=A.sc.key==='emei'&&!facing&&!m.sp;if(back)dmg*=1.6;const crit=Math.random()<A.crit;if(A.poison>0)dmg*=.85;if(crit)dmg*=2;dmg=Math.max(1,Math.round(dmg*(1-B.armor)));
- B.hp-=dmg;if(m.sp){B.ultFx={el:A.el,t:0,life:1.9};if((m.ky||0)>=500&&B.hp>0){G.fin={k:A.el.key,t:0,life:.42,P:[B.x,-(B.h+60)],seed:Math.random()*99};}if((m.ky||0)>=500||B.hp<=0){for(const pl of pillars)if(!pl.broken&&Math.abs(pl.x-B.x)<240)breakPillar(pl,sgn(pl.x-B.x)||1);}}
+ B.hp-=dmg;poseKick(B,dir,m.big?1.3:.75);if(m.sp){B.ultFx={el:A.el,t:0,life:1.9};if((m.ky||0)>=500&&B.hp>0){G.fin={k:A.el.key,t:0,life:.42,P:[B.x,-(B.h+60)],seed:Math.random()*99};}if((m.ky||0)>=500||B.hp<=0){for(const pl of pillars)if(!pl.broken&&Math.abs(pl.x-B.x)<240)breakPillar(pl,sgn(pl.x-B.x)||1);}}
  if(A.sc.key==='wudang'&&!m.sp&&!m.proj&&!(A.jyT>0)){A.jy=(A.jy||0)+1;if(A.jy>=6){A.jy=0;A.jyT=7;num(A.x,-A.h-175,'剑 意 满!','#e8f6ff',1);sfx('zap');shock(A.x,-A.h-70,120,A.el.b,.4,4);}}A.en=Math.min(100,A.en+(m.sp?4:13));B.en=Math.min(100,B.en+8);
  if(A===PL){G.combo++;G.comboT=1.6;G.maxCombo=Math.max(G.maxCombo,G.combo);G.hits++;trialHit(m.sp?'SP':A.mvKey);}else G.combo=0;
  num(B.x+rand(-10,10),hy-60,crit?dmg+'!':String(dmg),crit?C.gold:'#ffffff',crit||m.big);if(back){num(B.x,hy-105,'背 刺!','#cff4ff',1);for(let i=0;i<14;i++)frost(B.x,hy,rand(-260,260),rand(-260,80));}B.flashT=.08;G.kick=dir*(m.big?14:7);
@@ -1258,7 +1273,7 @@ function fighterUpdate(F,dt){const O=opp(F),I=F.in;F.ph+=dt;ultFxUpdate(F,dt);if
  F.x+=F.vx*dt;
  if(F.x<-ARENA||F.x>ARENA){const s=sgn(F.x);F.x=s*ARENA;if(F.state==='fly'&&Math.abs(F.vx)>380&&sgn(F.vx)===s){F.vx*=-.35;dust(F.x,-F.h,10);G.shake=Math.max(G.shake,8);sfx('thud');shock(F.x,-F.h-40,50,'#ffffff',.25,3);if(!F.ko)F.hp=Math.max(1,F.hp-4);}else F.vx=0;}
  if(F.state==='fly'&&Math.abs(F.vx)>260)for(const p of pillars){if(!p.broken&&Math.abs(F.x-p.x)<p.w/2+14&&F.h<p.h){breakPillar(p,sgn(F.vx));F.vx*=.5;if(!F.ko)F.hp=Math.max(1,F.hp-5);}}
- if(F.state!=='frozen'){const[tp,rate]=fighterTarget(F),T=pose((F.sc.pm&&F.sc.pm[tp])||tp,F.ph);if(F.sc.wpn==='whip'&&F.state!=='act')T.wa=1.35;blendTo(F,T,rate,dt);}
+ if(F.state!=='frozen'){const[tp,rate]=fighterTarget(F),T=pose((F.sc.pm&&F.sc.pm[tp])||tp,F.ph);if(F.state==='idle'||F.state==='block'){const b=Math.sin(F.ph*2.3),b2=Math.sin(F.ph*2.3-.7);T.N=[T.N[0]+b*.35,T.N[1]-b*.9];T.D=[T.D[0]+b2*.45,T.D[1]-b2*1.1];for(const k of ['lh','rh','le','re'])T[k]=[T[k][0]+b2*.4,T[k][1]-b2*(k[1]==='h'?1.3:.8)];}if(F.state==='walk'||F.state==='idle'){const lf=clamp(F.vx*F.face*.006,-3.5,3.5);T.N=[T.N[0]+lf,T.N[1]];T.D=[T.D[0]+lf*1.3,T.D[1]];}if(F.sc.wpn==='whip'&&F.state!=='act')T.wa=1.35;blendTo(F,T,rate,dt);}
  if(F.sc.wpn==='whip'){if(F.wlag==null)F.wlag=F.wa;let d=((F.wa-F.wlag+Math.PI)%(2*Math.PI)+2*Math.PI)%(2*Math.PI)-Math.PI;F.wlag+=d*(1-Math.exp(-9*dt));}
  if(F.dmarkT>0){F.dmarkT-=dt;if(F.dmarkT<=0)F.dmark=0;}
  const w=wpnWorld(F);
