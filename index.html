@@ -486,7 +486,7 @@ function KO(A,B,dir,hx,hy){B.ko=true;B.state='fly';B.vh=560;B.vx=dir*560;B.h=Mat
  G.ko={winner:A,loser:B,t:0};G.slow=1.4;impact(hx,hy,true);G.zk=1.22;G.freeze=.2;G.shake=18;shock(hx,hy,220,'#ffffff',.5,5);elBurst(A.el,hx,hy,40,true);sfx('big');sfx('gong');}
 function spawnSpecial(F){const O=opp(F),m=F.mv,sp=m.sp;
  if(sp==='firedragon'){projs.push({k:'dragon',owner:F,x:F.x+F.face*60,h:80,dir:F.face,spd:640,t:0,life:1.8,hit:false,dmg:m.dmg,name:m.name,trail:[],big:1});shock(F.x+F.face*50,-80,150,F.el.b,.45,6);elBurst(F.el,F.x+F.face*50,-80,30,true);sfx('roar');sfx('fire');}
- else if(sp==='tiger'){projs.push({k:'tiger',owner:F,x0:F.x+F.face*40,x1:O.x,x:F.x,h:0,dir:F.face,t:0,dur:.6,life:1.1,hit:false,dmg:m.dmg,name:m.name});sfx('tigr');sfx('zap');for(let i=0;i<4;i++)zbolt(F.x,-60,F.x+rand(-80,80),-700,.25,2,F.el.b);}
+ else if(sp==='tiger'){projs.push({k:'tiger',owner:F,x0:F.x+F.face*40,x1:O.x,x:F.x,h:0,dir:F.face,t:0,dur:.6,life:1.1,hit:false,dmg:m.dmg,name:m.name});sfx('tigr');sfx('zap');for(let i=0;i<6;i++)zbolt(F.x+rand(-30,30),-60,F.x+rand(-120,120),-760,.3,3,F.el.b);}
  else if(sp==='phoenix'){projs.push({k:'phoenix',owner:F,x:F.x-F.face*40,h:150,dir:F.face,spd:700,t:0,life:2.2,hit:false,dmg:m.dmg,name:m.name,trail:[]});sfx('cry');sfx('ice');}
  else if(sp==='turtle'){projs.push({k:'turtle',owner:F,x:O.x,h:0,dir:F.face,t:0,life:4,hit:false,dmg:m.dmg,name:m.name,tick:0});sfx('poison');sfx('rock');}
  else if(sp==='firewave'){projs.push({k:'fire',owner:F,x:F.x+F.face*70,h:0,dir:F.face,spd:620,t:0,life:1.5,hit:false,dmg:m.dmg,name:m.name});shock(F.x+F.face*40,-40,140,F.el.b,.4,6);elBurst(F.el,F.x+F.face*50,-50,30,true);}
@@ -572,7 +572,7 @@ function updateProjs(dt){for(const p of projs){p.t+=dt;const F=p.owner,O=opp(F);
  else if(p.k==='dragon'){p.x+=p.dir*p.spd*dt;p.trail.push([p.x,-p.h+Math.sin(p.t*14)*22]);if(p.trail.length>22)p.trail.shift();if(Math.random()<.9)addP({k:'glowp',x:p.x-p.dir*20,y:-p.h+rand(-24,24),vx:-p.dir*rand(40,140),vy:rand(-40,30),t:0,life:.45,sz:rand(6,12),col:F.el.b});
   if(F.el===ELS.fire)for(let i=0;i<2;i++)flame(p.x-p.dir*rand(10,60),-p.h+rand(-30,30),-p.dir*rand(20,80),rand(-80,-20),1.4);
   if(!p.hit&&Math.abs(O.x-p.x)<64&&Math.abs(O.h+50-p.h)<120){p.hit=true;if(resolveHit(F,O,{dmg:p.dmg,kx:480,ky:520,big:1,sp:1,stop:.14,name:p.name},p.dir)&&F.el===ELS.fire&&!O.ko){O.burn=3;O.burnT=5;}impact(O.x,-O.h-60,true);}}
- else if(p.k==='tiger'){const k=clamp(p.t/p.dur,0,1);if(p.t<.25)p.x1=lerp(p.x1,O.x,.2);p.x=lerp(p.x0,p.x1,k);p.h=Math.sin(k*Math.PI)*170;if(Math.random()<.8)zbolt(p.x+rand(-50,50),-p.h-rand(0,60),p.x+rand(-70,70),-p.h-rand(0,60),.06,1,F.el.b);
+ else if(p.k==='tiger'){const k=clamp(p.t/p.dur,0,1);if(p.t<.25)p.x1=lerp(p.x1,O.x,.2);p.x=lerp(p.x0,p.x1,k);p.h=Math.sin(k*Math.PI)*170;if(Math.random()<.8)zbolt(p.x+rand(-50,50),-p.h-rand(0,60),p.x+rand(-70,70),-p.h-rand(0,60),.08,2,F.el.b);if(Math.random()<.25)zbolt(p.x+rand(-40,40),-p.h-40,p.x+rand(-120,120),-760,.12,3,F.el.b);
   if(!p.hit&&k>=1){p.hit=true;for(let i=0;i<8;i++){const a=rand(0,6.28);zbolt(p.x,-30,p.x+Math.cos(a)*140,-30+Math.sin(a)*90,.25,2,F.el.b);}shock(p.x,0,160,F.el.b,.45,6,1);shock(p.x,-40,110,'#ffffff',.35,4);addCrack(p.x,130);G.skyFlash=.3;G.shake=Math.max(G.shake,14);sfx('strike');
    if(Math.abs(O.x-p.x)<90&&O.h<140){if(resolveHit(F,O,{dmg:p.dmg,kx:200,ky:0,big:1,sp:1,stop:.14,name:p.name},sgn(O.x-F.x)||1)&&!O.ko&&O.h<=0){O.state='hurt';O.t=0;O.stun=1.3;O.para=1.3;num(O.x,-O.h-160,'麻 痹!','#bfe8ff',1);}impact(O.x,-60,true);}}}
  else if(p.k==='phoenix'){p.x+=p.dir*p.spd*dt;p.h=150+Math.sin(p.t*3)*20-(Math.abs(p.x-O.x)<220?60:0);p.trail.push([p.x,-p.h]);if(p.trail.length>14)p.trail.shift();for(let i=0;i<3;i++)frost(p.x-p.dir*rand(20,90),-p.h+rand(-40,40),-p.dir*rand(30,120),rand(-40,80));
@@ -731,13 +731,14 @@ function drawProjs(){for(const p of projs){const el=p.owner.el;
  else if(p.k==='strike'){if(p.t<0)continue;if(!p.fired){const k=clamp(p.t/p.delay,0,1);ctx.strokeStyle=rgba(el.b,.4+.5*k);ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(p.x,0,60*(1.2-k*.4),12,0,0,6.283);ctx.stroke();ctx.globalCompositeOperation='lighter';glow(p.x,0,50,el.b,.25+k*.3);ctx.globalCompositeOperation='source-over';ctx.globalAlpha=1;}}
  else if(p.k==='ice'){if(p.t<0)continue;const k=p.t/p.life,hgt=(k<.15?k/.15:k>.7?(1-k)/.3:1)*78;ctx.fillStyle='#d8f6ff';ctx.strokeStyle='#4fb0e0';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(p.x-15,0);ctx.lineTo(p.x-3,-hgt);ctx.lineTo(p.x+2,-hgt*.7);ctx.lineTo(p.x+16,0);ctx.closePath();ctx.fill();ctx.stroke();ctx.fillStyle='rgba(255,255,255,.8)';ctx.beginPath();ctx.moveTo(p.x-8,0);ctx.lineTo(p.x-3,-hgt*.9);ctx.lineTo(p.x-1,0);ctx.fill();ctx.globalCompositeOperation='lighter';glow(p.x,-hgt*.5,40,el.b,.35);ctx.globalCompositeOperation='source-over';ctx.globalAlpha=1;}
  else if(p.k==='dragon'){if(p.big)drawBeastDragon(p.x,-p.h,p.dir,p.t,el,1.15,Math.min(1,(p.life-p.t)*3));else drawDragon(p,el,1);}
- else if(p.k==='tiger')drawBeastTiger(p.x,-p.h-56,p.dir,p.t,el,1.1,p.hit?Math.max(0,1-(p.t-p.dur)*3):1);
+ else if(p.k==='tiger')drawBeastTiger(p.x,-p.h-44,p.dir,p.t,el,.68,p.hit?Math.max(0,1-(p.t-p.dur)*3):1);
  else if(p.k==='phoenix'){ctx.globalCompositeOperation='lighter';for(let i=0;i<p.trail.length;i++){const q=p.trail[i],k=i/p.trail.length;glow(q[0]-p.dir*30,q[1]+10,14+k*30,el.b,.22*k);}ctx.globalCompositeOperation='source-over';ctx.globalAlpha=1;drawBeastPhoenix(p.x,-p.h,p.dir,p.t,el,1.2,Math.min(1,(p.life-p.t)*3));}
  else if(p.k==='turtle')drawTurtle(p,el);
  else if(p.k==='wave'){ctx.globalCompositeOperation='lighter';for(let i=0;i<p.trail.length;i++){const q=p.trail[i],k=(i+1)/p.trail.length;drawWaveShape(q[0],q[1],p.dir,k*.35,el,.8+k*.2);}drawWaveShape(p.x,-p.h,p.dir,1,el,1);glow(p.x,-p.h,90,el.b,.45);ctx.globalCompositeOperation='source-over';ctx.globalAlpha=1;}}}
 function drawWaveShape(x,y,dir,a,el,sz){ctx.save();ctx.translate(x,y);ctx.scale(dir*sz,sz);const R=62;
  ctx.beginPath();ctx.arc(-20,0,R,-1.35,1.35);ctx.arc(-46,0,R*.9,1.2,-1.2,true);ctx.closePath();ctx.globalAlpha=a*.7;ctx.fillStyle=el.b;ctx.fill();
  ctx.beginPath();ctx.arc(-20,0,R,-1.25,1.25);ctx.arc(-30,0,R*.95,1.18,-1.18,true);ctx.closePath();ctx.globalAlpha=a;ctx.fillStyle=el.a;ctx.fill();ctx.restore();}
+/* ===== Beast renderers (local helpers expected: ctx, rgba, glow, makeBolt, strokePts, rand) ===== */
 /* ===== Beast renderers (local helpers expected: ctx, rgba, glow, makeBolt, strokePts, rand) ===== */
 /* ===== Beast renderers (local helpers expected: ctx, rgba, glow, makeBolt, strokePts, rand) ===== */
 function bGrad(x0,y0,x1,y1,el,a){const g=ctx.createLinearGradient(x0,y0,x1,y1);g.addColorStop(0,rgba(el.a,a));g.addColorStop(.45,rgba(el.b,a));g.addColorStop(1,rgba(el.c,a));return g;}
@@ -847,8 +848,11 @@ function drawBeastTiger(x,y,dir,t,el,sc,al){if(al<=0)return;if(!TIGER_P.torso){f
  ctx.strokeStyle='#ffffff';ctx.lineWidth=3;ctx.save();ctx.shadowColor=el.a;ctx.shadowBlur=10;
  for(const[px,py,dx,n]of[[208,-4,1,4],[188,36,1,3],[-218,42,-1,3],[-222,27,-1,3]])for(let c=0;c<n;c++){ctx.beginPath();const cy=py-9+c*6;ctx.moveTo(px,cy);ctx.quadraticCurveTo(px+9*dx,cy-3,px+13*dx,cy+5);ctx.stroke();}
  ctx.restore();
- // lightning crackle
- ctx.globalCompositeOperation='lighter';ctx.strokeStyle=rgba('#ffffff',.85);ctx.lineWidth=1.6;for(let k=0;k<5;k++){const a=rand(-180,170),b=rand(-90,30);strokePts(makeBolt(a,b,a+rand(-60,60),b+rand(-50,50)));}
+ // electric edge + thick crackling arcs
+ ctx.globalCompositeOperation='lighter';ctx.save();ctx.shadowColor=el.b;ctx.shadowBlur=18;ctx.strokeStyle=rgba('#ffffff',.9);ctx.lineWidth=2.5;ctx.setLineDash([14,22]);ctx.lineDashOffset=-t*400;for(const p of[P.torso,P.thigh,P.fl1,P.head])ctx.stroke(p);ctx.setLineDash([]);
+ for(let k=0;k<7;k++){const a=rand(-200,180),b=rand(-110,40),pts=makeBolt(a,b,a+rand(-90,90),b+rand(-70,70));ctx.strokeStyle=rgba(el.b,.9);ctx.lineWidth=6;strokePts(pts);ctx.strokeStyle='#ffffff';ctx.lineWidth=2.2;strokePts(pts);}
+ for(let k=0;k<3;k++){const a=rand(-160,160),pts=makeBolt(a,-20,a+rand(-60,60),rand(-260,-160));ctx.strokeStyle=rgba(el.b,.8);ctx.lineWidth=5;strokePts(pts);ctx.strokeStyle='#ffffff';ctx.lineWidth=1.8;strokePts(pts);}
+ ctx.restore();
  ctx.globalCompositeOperation='source-over';ctx.restore();ctx.globalAlpha=1;}
 
 /* ---------- Ice phoenix ---------- */
