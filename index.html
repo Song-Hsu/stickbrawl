@@ -137,95 +137,95 @@ function persist(){try{localStorage.setItem('stickbrawl-save',JSON.stringify(SAV
 
 /* ---------- schools, weapons, moves ---------- */
 const ELS={
- fire:{key:'fire',name:'烈焰',a:'#fff0b0',b:'#ff7a2a',c:'#d4300f',snd:'fire',eff:'灼烧',desc:'命中叠加灼烧，持续掉血，最多 3 层',tip:'压着打，让火慢慢烧',sp:{name:'金钟伏魔',sp:'firebell',dmg:32},spd:'烈焰铜钟从天而降罩住对手，连响三声后炸开'},
- bolt:{key:'bolt',name:'雷电',a:'#ffffff',b:'#6cc4ff',c:'#3a6bff',snd:'zap',eff:'麻痹',desc:'命中积累电荷，满 5 层麻痹对手，趁机白打一套',tip:'连段越长越赚',sp:{name:'雷霆猛虎',sp:'tiger',dmg:28},spd:'雷虎扑向对手，打中直接麻痹'},
- ice:{key:'ice',name:'寒冰',a:'#ffffff',b:'#9fe6ff',c:'#3f9fd8',snd:'ice',eff:'冰封',desc:'命中让对手变慢，冻满就冰封；冰封时用重击碎冰暴击',tip:'先冻住，再用重击收尾',sp:{name:'凤鸣九霄',sp:'phoenix',dmg:24},spd:'冰凤凰飞过全场，打中立刻冰封'},
- qi:{key:'qi',name:'剧毒',a:'#e8ffd0',b:'#8cf04a',c:'#3f8a1f',snd:'poison',eff:'中毒',desc:'命中叠毒最多 5 层，越叠掉血越快；中毒者架势不回、伤害 −15%',tip:'多打几下，让毒慢慢发作',sp:{name:'五毒玄武',sp:'turtle',dmg:22},spd:'玄武毒蛇从天咬下，留下一片毒雾'},
- gold:{key:'gold',name:'真气',a:'#fff6d0',b:'#ffc83a',c:'#c0820e',snd:'thud',eff:'龙威',desc:'命中叠龙威，满 3 层震飞对手并追加伤害',tip:'连打三下，龙威震飞',sp:{name:'金龙出海',sp:'golddragon',dmg:30},spd:'金龙翻滚而出，缠住对手再震飞'}};
-const EL_ORDER=['fire','bolt','ice','qi','gold'];ELS.gold.wave='金龙破土';ELS.fire.wave='烈焰掌风';ELS.bolt.wave='雷光剑气';ELS.ice.wave='冰魄针';ELS.qi.wave='毒液弹';if(!ELS[SAVE.el])SAVE.el='fire';
+ fire:{key:'fire',name:'烈焰',a:'#fff0b0',b:'#ff7a2a',c:'#d4300f',snd:'fire',eff:'灼烧',desc:'命中叠加灼烧，持续掉血，最多 3 层',tip:'压着打，让火慢慢烧',sp:{name:'金钟伏魔',sp:'firebell',dmg:50},spd:'烈焰铜钟从天而降罩住对手，连响三声后炸开'},
+ bolt:{key:'bolt',name:'雷电',a:'#ffffff',b:'#6cc4ff',c:'#3a6bff',snd:'zap',eff:'麻痹',desc:'命中积累电荷，满 5 层麻痹对手，趁机白打一套',tip:'连段越长越赚',sp:{name:'雷霆猛虎',sp:'tiger',dmg:48},spd:'雷虎扑向对手，打中直接麻痹'},
+ ice:{key:'ice',name:'寒冰',a:'#ffffff',b:'#9fe6ff',c:'#3f9fd8',snd:'ice',eff:'冰封',desc:'命中让对手变慢，冻满就冰封；冰封时用重击碎冰暴击',tip:'先冻住，再用重击收尾',sp:{name:'凤鸣九霄',sp:'phoenix',dmg:48},spd:'冰凤凰飞过全场，打中立刻冰封'},
+ qi:{key:'qi',name:'剧毒',a:'#e8ffd0',b:'#8cf04a',c:'#3f8a1f',snd:'poison',eff:'中毒',desc:'命中叠毒最多 5 层，越叠掉血越快；中毒者架势不回、伤害 −15%',tip:'多打几下，让毒慢慢发作',sp:{name:'五毒玄武',sp:'turtle',dmg:42},spd:'玄武毒蛇从天咬下，留下一片毒雾'},
+ gold:{key:'gold',name:'真气',a:'#fff6d0',b:'#ffc83a',c:'#c0820e',snd:'thud',eff:'龙威',desc:'命中叠龙威，满 3 层震飞对手并追加伤害',tip:'连打三下，龙威震飞',sp:{name:'金龙出海',sp:'golddragon',dmg:50},spd:'金龙翻滚而出，缠住对手再震飞'}};
+const EL_ORDER=['fire','bolt','ice','qi','gold'];ELS.gold.wave='回旋棒';ELS.fire.wave='烈焰掌风';ELS.bolt.wave='雷光剑气';ELS.ice.wave='冰魄针';ELS.qi.wave='毒液弹';if(!ELS[SAVE.el])SAVE.el='fire';
 const TPL={
  L1:{pose:'slashA',dur:.3,act:[.09,.16],rk:1,dmg:6,kx:110,lunge:120,stop:.045},
  L2:{pose:'slashB',dur:.3,act:[.09,.16],rk:1,dmg:6,kx:110,lunge:120,stop:.045},
  L3:{pose:'thrust',dur:.32,act:[.1,.17],rk:1.1,dmg:7,kx:130,lunge:220,stop:.05},
  L4:{pose:'spin',dur:.38,act:[.12,.21],rk:1.1,dmg:8,kx:150,lunge:160,stop:.06},
- L5:{fin:1,pose:'overhead',dur:.6,act:[.24,.32],rk:1.12,dmg:14,kx:560,ky:300,big:1,crack:1,lunge:200,stop:.12},
+ L5:{fin:1,pose:'overhead',dur:.6,act:[.24,.32],rk:1.12,dmg:11,kx:560,ky:300,big:1,crack:1,lunge:200,stop:.12},
  H:{pose:'rising',dur:.5,act:[.16,.24],rk:1,dmg:9,kx:50,ky:920,big:1,launch:1,lunge:90,stop:.1},
  AL1:{pose:'airSlash',dur:.26,act:[.06,.13],rk:1,dmg:6,kx:60,air:1,stop:.045},
  AL2:{pose:'airSlashB',dur:.26,act:[.06,.13],rk:1,dmg:6,kx:60,air:1,stop:.045},
- AL3:{fin:1,pose:'airSlash',dur:.4,act:[.1,.18],rk:1.12,dmg:11,kx:200,spike:1,big:1,air:1,stop:.11},
- AH:{pose:'plunge',plunge:1,dur:1.1,rk:1.1,dmg:17,kx:320,ky:480,big:1,gb:1,air:1,fin:0,stop:.14},
- DA:{pose:'thrust',dur:.4,act:[.06,.2],rk:1.1,dmg:10,kx:420,ky:140,big:1,lunge:950,stop:.08},
+ AL3:{fin:1,pose:'airSlash',dur:.4,act:[.1,.18],rk:1.12,dmg:9,kx:200,spike:1,big:1,air:1,stop:.11},
+ AH:{pose:'plunge',plunge:1,dur:1.1,rk:1.1,dmg:10,kx:320,ky:480,big:1,gb:1,air:1,fin:0,stop:.14},
+ DA:{pose:'thrust',dur:.4,act:[.06,.2],rk:1.1,dmg:8.5,kx:420,ky:140,big:1,lunge:950,stop:.08},
  H2:{pose:'flurry',multi:[.1,.17,.24,.31,.42],dur:.66,act:[.08,.44],rk:1.05,dmg:4,kx:70,lunge:110,stop:.035,fin:{kx:560,ky:380,dmg:10,stop:.12}},
- BC:{fin:1,pose:'spin',dur:.46,act:[.1,.2],rk:1.25,dmg:13,kx:420,ky:320,big:1,lunge:900,stop:.1},
- PC:{pose:'thrust',dur:.55,act:[.05,.16],rk:1.7,dmg:22,kx:260,ky:560,big:1,lunge:1700,pierce:1,stop:.2}};
+ BC:{fin:1,pose:'spin',dur:.46,act:[.1,.2],rk:1.25,dmg:10,kx:420,ky:320,big:1,lunge:900,stop:.1},
+ PC:{pose:'thrust',dur:.55,act:[.05,.16],rk:1.7,dmg:16,kx:260,ky:560,big:1,lunge:1700,pierce:1,stop:.2}};
 const TPL_FIST={
  L1:{pose:'jab',limb:'lh',sw:'jab',dur:.24,act:[.06,.12],rk:1,dmg:5,kx:90,lunge:120,stop:.04,blunt:1,sy:35},
  L2:{pose:'cross',limb:'rh',sw:'jab',dur:.27,act:[.07,.13],rk:1.05,dmg:6,kx:110,lunge:150,stop:.045,blunt:1,sy:34},
  L3:{pose:'fkick',limb:'rf',sw:'arc',srot:-.35,sy:28,dur:.32,act:[.1,.17],rk:1.2,dmg:7,kx:160,lunge:160,stop:.05,blunt:1},
  L4:{pose:'sweep',limb:'rf',sw:'arc',srot:.15,sy:5,dur:.36,act:[.11,.2],rk:1.28,dmg:8,kx:40,ky:340,lunge:120,stop:.06,blunt:1},
- L5:{fin:1,pose:'palm',limb:'rh',sw:'ring',sy:32,dur:.56,act:[.22,.3],rk:1.18,dmg:14,kx:640,ky:260,big:1,armor:1,lunge:230,stop:.12,blunt:1},
+ L5:{fin:1,pose:'palm',limb:'rh',sw:'ring',sy:32,dur:.56,act:[.22,.3],rk:1.18,dmg:11,kx:640,ky:260,big:1,armor:1,lunge:230,stop:.12,blunt:1},
  H:{pose:'upper',limb:'rh',sw:'arc',srot:-1.25,sy:42,dur:.46,act:[.14,.22],rk:1,dmg:9,kx:50,ky:940,big:1,launch:1,lunge:120,stop:.1,blunt:1},
  AL1:{pose:'apunch',limb:'rh',sw:'jab',sy:28,dur:.22,act:[.05,.11],rk:1.05,dmg:5,kx:60,air:1,stop:.04,blunt:1},
  AL2:{pose:'apunch2',limb:'lh',sw:'jab',sy:28,dur:.22,act:[.05,.11],rk:1.05,dmg:5,kx:60,air:1,stop:.04,blunt:1},
- AL3:{fin:1,pose:'akick',limb:'rf',sw:'arc',srot:.9,sy:10,dur:.38,act:[.09,.17],rk:1.25,dmg:11,kx:200,spike:1,big:1,air:1,stop:.11,blunt:1},
- AH:{pose:'plunge',hov:.02,dw:'stompW',ds:'stompS',limb:'rf',sw:'none',plunge:1,dur:1.1,rk:1.35,dmg:17,kx:320,ky:480,big:1,gb:1,air:1,fin:0,stop:.14,blunt:1},
- DA:{pose:'shoulder',limb:'N',sw:'ring',sy:34,dur:.42,act:[.06,.22],rk:1,dmg:11,kx:480,ky:160,big:1,armor:1,lunge:900,stop:.09,blunt:1},
+ AL3:{fin:1,pose:'akick',limb:'rf',sw:'arc',srot:.9,sy:10,dur:.38,act:[.09,.17],rk:1.25,dmg:9,kx:200,spike:1,big:1,air:1,stop:.11,blunt:1},
+ AH:{pose:'plunge',hov:.02,dw:'stompW',ds:'stompS',limb:'rf',sw:'none',plunge:1,dur:1.1,rk:1.35,dmg:10,kx:320,ky:480,big:1,gb:1,air:1,fin:0,stop:.14,blunt:1},
+ DA:{pose:'shoulder',limb:'N',sw:'ring',sy:34,dur:.42,act:[.06,.22],rk:1,dmg:8.5,kx:480,ky:160,big:1,armor:1,lunge:900,stop:.09,blunt:1},
  H2:{pose:'punchL',mpose:['punchL','punchR'],limbs:['lh','rh'],sw:'jab',sy:33,multi:[.06,.1,.14,.18,.22,.26,.3,.42],dur:.62,act:[.05,.44],rk:1.05,dmg:3,kx:40,lunge:90,stop:.03,armor:1,blunt:1,fin:{kx:600,ky:360,dmg:9,stop:.12}},
- BC:{fin:1,pose:'skick',limb:'rf',sw:'arc',srot:-.55,sy:42,dur:.46,act:[.1,.2],rk:1.3,dmg:13,kx:420,ky:340,big:1,lunge:900,stop:.1,blunt:1},
+ BC:{fin:1,pose:'skick',limb:'rf',sw:'arc',srot:-.55,sy:42,dur:.46,act:[.1,.2],rk:1.3,dmg:10,kx:420,ky:340,big:1,lunge:900,stop:.1,blunt:1},
  CH:{pose:'charge',charge:1,limb:'rh',dur:9,act:[9,9],rk:1,dmg:0,armor:1},
  CP:{pose:'cross',limb:'rh',sw:'ring',sy:34,dur:.5,act:[.06,.16],rk:1.45,dmg:11,kx:720,ky:220,big:1,armor:1,lunge:800,stop:.16,cp:1},
- PC:{pose:'inch',limb:'rh',sw:'ring',sy:30,dur:.55,act:[.08,.16],rk:1.35,dmg:22,kx:950,ky:300,big:1,lunge:900,stop:.22,blunt:1,armor:1}};
+ PC:{pose:'inch',limb:'rh',sw:'ring',sy:30,dur:.55,act:[.08,.16],rk:1.35,dmg:16,kx:950,ky:300,big:1,lunge:900,stop:.22,blunt:1,armor:1}};
 const TPL_SWORD={
  L1:{pose:'point',sw:'jab',sy:36,dur:.26,act:[.07,.13],rk:1.08,dmg:5,kx:90,lunge:160,stop:.04},
  L2:{pose:'liao',sw:'arc',srot:-.85,dur:.28,act:[.08,.15],rk:1,dmg:6,kx:110,lunge:120,stop:.045},
  L3:{pose:'slashA',sw:'arc',srot:.45,dur:.3,act:[.09,.16],rk:1.05,dmg:6,kx:120,lunge:150,stop:.045},
  L4:{pose:'yun',sw:'taiji',sy:38,dur:.38,act:[.12,.22],rk:1.1,dmg:8,kx:150,lunge:140,stop:.06},
- L5:{fin:1,pose:'spin',sw:'arc',srot:0,qi:1,dur:.56,act:[.2,.28],rk:1.1,dmg:12,kx:520,ky:260,big:1,lunge:200,stop:.12},
+ L5:{fin:1,pose:'spin',sw:'arc',srot:0,qi:1,dur:.56,act:[.2,.28],rk:1.1,dmg:11,kx:520,ky:260,big:1,lunge:200,stop:.12},
  H:{pose:'rising',sw:'taiji',sy:40,dur:.5,act:[.16,.24],rk:1,dmg:9,kx:50,ky:920,big:1,launch:1,lunge:90,stop:.1},
- AL1:TPL.AL1,AL2:TPL.AL2,AL3:TPL.AL3,AH:{pose:'airSlashB',airq:1,sw:'none',dur:.6,act:[.1,.45],air:1,rk:1,dmg:7,big:1,stop:.06},
- DA:{pose:'point',sw:'jab',sy:36,dur:.4,act:[.06,.2],rk:1.12,dmg:10,kx:420,ky:140,big:1,lunge:1050,stop:.08},
+ AL1:TPL.AL1,AL2:TPL.AL2,AL3:TPL.AL3,AH:{pose:'airSlashB',airq:1,sw:'none',dur:.6,act:[.1,.45],air:1,rk:1,dmg:4.5,big:1,stop:.06},
+ DA:{pose:'point',sw:'jab',sy:36,dur:.4,act:[.06,.2],rk:1.12,dmg:8.5,kx:420,ky:140,big:1,lunge:1050,stop:.08},
  H2:{pose:'point',mpose:['point','pointLo'],sw:'jab',sy:34,multi:[.08,.13,.18,.23,.28,.4],dur:.6,act:[.06,.42],rk:1.1,dmg:3.5,kx:50,lunge:110,stop:.03,fin:{kx:560,ky:380,dmg:10,stop:.12}},
- BC:{fin:1,pose:'spin',sw:'taiji',sy:34,dur:.46,act:[.1,.2],rk:1.25,dmg:13,kx:420,ky:320,big:1,lunge:900,stop:.1},
- PC:{pose:'point',sw:'none',dur:.55,act:[.05,.16],rk:1.7,dmg:22,kx:260,ky:560,big:1,lunge:1700,pierce:1,stop:.2}};
+ BC:{fin:1,pose:'spin',sw:'taiji',sy:34,dur:.46,act:[.1,.2],rk:1.25,dmg:10,kx:420,ky:320,big:1,lunge:900,stop:.1},
+ PC:{pose:'point',sw:'none',dur:.55,act:[.05,.16],rk:1.7,dmg:16,kx:260,ky:560,big:1,lunge:1700,pierce:1,stop:.2}};
 const TPL_STICK={
  L1:{pose:'poke',sw:'jab',sy:26,dur:.26,act:[.07,.13],rk:1.1,dmg:5,kx:100,lunge:130,stop:.04},
  L2:{pose:'chop',sw:'arc',srot:.95,dur:.3,act:[.1,.16],rk:1,dmg:6,kx:110,lunge:120,stop:.045},
  L3:{pose:'twirl',mpose:['twirl'],sw:'twirl',sy:32,multi:[.08,.15,.22],dur:.4,act:[.06,.24],rk:.92,dmg:3,kx:60,lunge:110,stop:.035,fin:{kx:150,dmg:4,stop:.05}},
  L4:{pose:'lowsweep',sw:'arc',srot:.25,sy:6,dur:.36,act:[.11,.2],rk:1.15,dmg:7,kx:40,trip:1,lunge:120,stop:.06},
- L5:{fin:1,pose:'overhead',sw:'arc',srot:.95,hop:430,dur:.62,act:[.26,.34],rk:1.12,dmg:14,kx:520,ky:320,big:1,crack:1,lunge:220,stop:.12},
+ L5:{fin:1,pose:'overhead',sw:'arc',srot:.95,hop:430,dur:.62,act:[.26,.34],rk:1.12,dmg:11,kx:520,ky:320,big:1,crack:1,lunge:220,stop:.12},
  H:{pose:'rising',sw:'arc',srot:-.85,dur:.5,act:[.16,.24],rk:1,dmg:9,kx:50,ky:920,big:1,launch:1,lunge:90,stop:.1},
  AL1:{pose:'apoke',sw:'jab',sy:26,dur:.26,act:[.06,.13],rk:1.05,dmg:6,kx:60,air:1,stop:.045},
  AL2:TPL.AL2,AL3:TPL.AL3,AH:Object.assign({},TPL.AH,{dw:'chop_w',ds:'chop',quakeOut:1}),
- DA:{pose:'vault',sw:'jab',sy:24,hop:540,dur:.5,act:[.14,.3],rk:1.05,dmg:10,kx:420,ky:160,big:1,lunge:820,stop:.08},
+ DA:{pose:'vault',sw:'jab',sy:24,hop:540,dur:.5,act:[.14,.3],rk:1.05,dmg:8.5,kx:420,ky:160,big:1,lunge:820,stop:.08},
  H2:{pose:'poke',mpose:['poke','pokeHi'],sw:'jab',sy:30,multi:[.07,.12,.17,.22,.27,.32,.44],dur:.64,act:[.05,.46],rk:1.08,dmg:3,kx:40,lunge:100,stop:.03,fin:{kx:560,ky:380,dmg:9,stop:.12}},
- BC:{fin:1,pose:'spin',sw:'twirl',sy:32,dur:.46,act:[.1,.2],rk:1.25,dmg:13,kx:420,ky:320,big:1,lunge:900,stop:.1},
- PC:{pose:'hook',sw:'arc',srot:.2,sy:8,dur:.55,act:[.06,.16],rk:1.45,dmg:18,kx:-170,ky:760,launch:1,big:1,lunge:700,stop:.18}};
+ BC:{fin:1,pose:'spin',sw:'twirl',sy:32,dur:.46,act:[.1,.2],rk:1.25,dmg:10,kx:420,ky:320,big:1,lunge:900,stop:.1},
+ PC:{pose:'hook',sw:'arc',srot:.2,sy:8,dur:.55,act:[.06,.16],rk:1.45,dmg:16,kx:-170,ky:760,launch:1,big:1,lunge:700,stop:.18}};
 const TPL_SPIKE={
  L1:{pose:'jab',limb:'lh',sw:'jab',sy:35,dur:.22,act:[.05,.11],rk:1,dmg:4.5,kx:80,lunge:130,stop:.035},
  L2:{pose:'cross',limb:'rh',sw:'jab',sy:34,dur:.24,act:[.06,.12],rk:1.05,dmg:4.5,kx:90,lunge:140,stop:.04},
  L3:{pose:'emSpin',mpose:['emSpin','emSpin2'],limbs:['rh','lh'],sw:'twirl',sy:34,multi:[.07,.14],dur:.32,act:[.05,.17],rk:1.05,dmg:3,kx:60,lunge:150,stop:.035,fin:{kx:120,dmg:3.5,stop:.05}},
  L4:{pose:'fkick',limb:'rf',sw:'arc',srot:-.35,sy:28,dur:.3,act:[.09,.16],rk:1.2,dmg:6,kx:40,ky:330,lunge:150,stop:.05},
- L5:{fin:1,pose:'stabDown',limb:'rh',sw:'arc',srot:.95,hop:380,dur:.5,act:[.2,.27],rk:1.12,dmg:12,kx:520,ky:280,big:1,lunge:240,stop:.11},
+ L5:{fin:1,pose:'stabDown',limb:'rh',sw:'arc',srot:.95,hop:380,dur:.5,act:[.2,.27],rk:1.12,dmg:11,kx:520,ky:280,big:1,lunge:240,stop:.11},
  H:{pose:'upper',limb:'rh',sw:'arc',srot:-1.25,sy:42,dur:.42,act:[.12,.2],rk:1,dmg:8,kx:50,ky:940,big:1,launch:1,lunge:130,stop:.1},
  AL1:Object.assign({},TPL_FIST.AL1,{dmg:4.5}),AL2:Object.assign({},TPL_FIST.AL2,{dmg:4.5}),AL3:Object.assign({},TPL_FIST.AL3,{blunt:0}),AH:Object.assign({},TPL.AH,{dw:'stabDown_w',ds:'stabDown',rebound:1,hov:.1}),
- DA:{pose:'swallow',limb:'rh',sw:'jab',sy:30,dur:.42,act:[.05,.2],rk:1.15,dmg:10,kx:380,ky:160,big:1,lunge:1150,pierce:1,noIchi:1,stop:.08},
+ DA:{pose:'swallow',limb:'rh',sw:'jab',sy:30,dur:.42,act:[.05,.2],rk:1.15,dmg:8.5,kx:380,ky:160,big:1,lunge:1150,pierce:1,noIchi:1,stop:.08},
  H2:{pose:'punchL',mpose:['punchL','punchR'],limbs:['lh','rh'],sw:'jab',sy:33,multi:[.05,.085,.12,.155,.19,.225,.26,.295,.33,.42],dur:.6,act:[.04,.44],rk:1.05,dmg:2.4,kx:30,lunge:100,stop:.025,fin:{kx:580,ky:360,dmg:8,stop:.12}},
- BC:{fin:1,pose:'emSpin',limb:'rh',sw:'twirl',sy:34,dur:.42,act:[.09,.18],rk:1.25,dmg:12,kx:420,ky:320,big:1,lunge:900,stop:.1},
- PC:{pose:'cross',limb:'rh',sw:'jab',sy:34,dur:.5,act:[.05,.14],rk:1.6,dmg:20,kx:300,ky:560,big:1,lunge:1500,pierce:1,stop:.2}};
+ BC:{fin:1,pose:'emSpin',limb:'rh',sw:'twirl',sy:34,dur:.42,act:[.09,.18],rk:1.25,dmg:10,kx:420,ky:320,big:1,lunge:900,stop:.1},
+ PC:{pose:'cross',limb:'rh',sw:'jab',sy:34,dur:.5,act:[.05,.14],rk:1.6,dmg:16,kx:300,ky:560,big:1,lunge:1500,pierce:1,stop:.2}};
 const TPL_WHIP={
  L1:{pose:'slashA',sw:'arc',srot:.45,dur:.32,act:[.1,.17],rk:1,dmg:5,kx:110,lunge:60,stop:.045},
  L2:{pose:'slashB',sw:'arc',srot:-.85,dur:.32,act:[.1,.17],rk:1,dmg:5,kx:110,lunge:60,stop:.045},
  L3:{pose:'overhead',sw:'arc',srot:1.1,dur:.36,act:[.13,.2],rk:1.05,dmg:6,kx:120,lunge:60,stop:.05},
  L4:{pose:'spin',sw:'arc',srot:0,dur:.42,act:[.13,.22],rk:1.05,dmg:6,kx:-110,lunge:40,stop:.07,big:1},
- L5:{fin:1,pose:'thrust',sw:'jab',sy:32,dur:.58,act:[.24,.32],rk:1.18,dmg:13,kx:600,ky:260,big:1,lunge:120,stop:.12},
+ L5:{fin:1,pose:'thrust',sw:'jab',sy:32,dur:.58,act:[.24,.32],rk:1.18,dmg:11,kx:600,ky:260,big:1,lunge:120,stop:.12},
  H:{pose:'rising',sw:'arc',srot:-.85,dur:.5,act:[.16,.24],rk:1,dmg:9,kx:50,ky:920,big:1,launch:1,lunge:60,stop:.1},
- AL1:TPL.AL1,AL2:TPL.AL2,AL3:TPL.AL3,AH:{pose:'airSlash',grab:1,sw:'none',dur:.62,act:[.14,.24],air:1,rk:1,dmg:9,big:1,stop:.1},
- DA:{pose:'thrust',sw:'jab',sy:28,dur:.44,act:[.08,.22],rk:1.05,dmg:10,kx:420,ky:140,big:1,lunge:780,stop:.08},
+ AL1:TPL.AL1,AL2:TPL.AL2,AL3:TPL.AL3,AH:{pose:'airSlash',grab:1,sw:'none',dur:.62,act:[.14,.24],air:1,rk:1,dmg:8,big:1,stop:.1},
+ DA:{pose:'thrust',sw:'jab',sy:28,dur:.44,act:[.08,.22],rk:1.05,dmg:8.5,kx:420,ky:140,big:1,lunge:780,stop:.08},
  H2:{pose:'slashA',mpose:['slashA','slashB'],sw:'arc',srot:.2,multi:[.08,.15,.22,.29,.36,.46],dur:.66,act:[.06,.48],rk:1,dmg:3.2,kx:50,lunge:40,stop:.03,fin:{kx:560,ky:380,dmg:9,stop:.12}},
- BC:{fin:1,pose:'spin',sw:'arc',srot:0,dur:.48,act:[.12,.22],rk:1.2,dmg:13,kx:420,ky:320,big:1,lunge:700,stop:.1},
+ BC:{fin:1,pose:'spin',sw:'arc',srot:0,dur:.48,act:[.12,.22],rk:1.2,dmg:10,kx:420,ky:320,big:1,lunge:700,stop:.1},
  DT:{pose:'rising',dt:1,sw:'none',dur:.55,act:[.2,.24],rk:9,dmg:0},
- GR:{pose:'thrust',sw:'jab',sy:32,dur:.6,act:[.08,.18],rk:1.45,dmg:12,kx:-560,big:1,lunge:120,stop:.16},
- PC:{pose:'thrust',sw:'jab',sy:32,dur:.5,act:[.05,.14],rk:1.6,dmg:20,kx:300,ky:560,big:1,lunge:900,stop:.2}};
+ GR:{pose:'thrust',sw:'jab',sy:32,dur:.6,act:[.08,.18],rk:1.45,dmg:9,kx:-560,big:1,lunge:120,stop:.16},
+ PC:{pose:'thrust',sw:'jab',sy:32,dur:.5,act:[.05,.14],rk:1.6,dmg:16,kx:300,ky:560,big:1,lunge:900,stop:.2}};
 function buildMoves(o){const M={},T0=o.tpl||TPL;for(const k in T0){const t=T0[k],m=Object.assign({},t);m.reach=Math.round(o.reach*(t.rk||1));m.dmg=t.dmg*o.dm;if(t.act&&!t.plunge){m.act=[t.act[0]*o.sp,t.act[1]*o.sp];m.dur=t.dur*o.sp;}if(t.multi)m.multi=t.multi.map(x=>x*o.sp);if(t.fin)m.fin=Object.assign({},t.fin,{dmg:t.fin.dmg*o.dm});if(o.names[k])m.name=o.names[k];M[k]=m;}
  M.SP=Object.assign({pose:'special',dur:1,act:[.5,.55],big:1},o.SP);return M;}
 const SCHOOLS={
@@ -235,7 +235,7 @@ const SCHOOLS={
  wudang:{name:'武当',el:'bolt',elName:'雷电',wpn:'sword',wname:'太极剑',L:38,col:'#6cc4ff',cape:'#2556b8',scarf:'#8fd8ff',hp:1,spd:275,dashCd:.55,dashI:.34,cost:250,tier:2,pow:1.1,combo:'攻×4 · 重挑飞追击 · 攻攻重剑雨 · 冲刺攻 · 完美格挡自动反击 · 剑意满每剑带剑气',R:{next:{L1:'L2',L2:'L3',L3:'L5'},hv:{_:'H',L1:'H',L2:'H2',L3:'H2',DA:'H'},da:1,pc:1,chase:1},pm:{idle:'idleSw',special_w:'cWD_w',special:'cWD'},parryW:.27,
   motto:'点、撩、云、刺，剑走轻灵，剑气伤人',passive:'太极：完美格挡更容易，格挡成功自动反击；连中 6 下剑意满，7 秒内每剑都放剑气',
   moves:buildMoves({tpl:TPL_SWORD,reach:145,sp:.86,dm:.92,names:{L4:'云剑',L5:'剑气纵横',H:'太极剑意',AL3:'雷落九天',DA:'一线天',AH:'剑落九天',H2:'流星剑雨',BC:'回身剑',PC:'一剑破空'},SP:{name:'引雷诀',sp:'strikes',dmg:12}})},
- gaibang:{name:'丐帮',el:'gold',elName:'真气',wpn:'stick',otg:1,wname:'青竹棒',L:54,col:'#ffd04a',cape:'#6e5226',scarf:'#c9a24a',hp:1.1,spd:250,dashCd:.75,crit:.12,cost:1100,tier:4,pow:1.26,combo:'攻×5 · 攻攻重扫倒→攻 落井下石 · 攻重追击 · 攻攻攻重 · 前后冲刺攻',R:{next:{L1:'L2',L2:'L3',L3:'L4',L4:'L5'},hv:{_:'H',L1:'H',L2:'L4',L3:'H2',DA:'H',BC:'H'},da:1,bc:1,pc:1,chase:1},pm:{idle:'idleStk',special_w:'cGB_w',special:'cGB'},wv:'quake',wvPose:'chop',
+ gaibang:{name:'丐帮',el:'gold',elName:'真气',wpn:'stick',otg:1,wname:'青竹棒',L:54,col:'#ffd04a',cape:'#6e5226',scarf:'#c9a24a',hp:1.1,spd:250,dashCd:.75,crit:.12,cost:1100,tier:4,pow:1.26,combo:'攻×5 · 攻攻重扫倒→攻 落井下石 · 攻重追击 · 攻攻攻重 · 前后冲刺攻',R:{next:{L1:'L2',L2:'L3',L3:'L4',L4:'L5'},hv:{_:'H',L1:'H',L2:'L4',L3:'H2',DA:'H',BC:'H'},da:1,bc:1,pc:1,chase:1},pm:{idle:'idleStk',special_w:'cGB_w',special:'cGB'},wv:'boomer',wvPose:'slashA',
   motto:'戳、劈、缠、扫、挑、勾，棒长招巧，招式变化最多',passive:'落井下石：只有丐帮能打倒地的人；扫地棒直接扫倒；暴击 +12%',
   moves:buildMoves({tpl:TPL_STICK,reach:162,sp:.96,dm:1,names:{L3:'缠棒',L4:'扫地棒',L5:'当头一棒',H:'挑天',AL3:'落棒',DA:'飞身棒',AH:'泰山压顶',H2:'棒影重重',BC:'回马棒',PC:'勾棒'},SP:{}})},
  emei:{name:'峨眉',el:'ice',elName:'寒冰',wpn:'spike',dj:1,wname:'峨眉刺',L:10,ext:17,col:'#9fe6ff',cape:'#2f6f96',scarf:'#cfefff',hp:.95,spd:290,dashCd:.45,dashI:.3,cost:600,tier:3,pow:1.18,combo:'攻×5 · 二段跳 · 冲刺穿身后背刺 · 攻攻重追击 · 攻攻攻重 · 格挡反击',R:{next:{L1:'L2',L2:'L3',L3:'L4',L4:'L5'},hv:{_:'H',L1:'H',L2:'H',L3:'H2',L4:'H2',DA:'H',BC:'H'},da:1,bc:1,pc:1,chase:1},pm:{idle:'idleEm',special_w:'cEM_w',special:'cEM'},wv:'needle',wvPose:'cross',
@@ -245,7 +245,7 @@ const SCHOOLS={
   motto:'蛇鞭最长，抽、缠、锁，隔着老远就能下毒',passive:'万毒噬心：毒叠到 3 层以上按 重 引爆，层数越多越疼；毒伤翻倍',
   moves:buildMoves({tpl:TPL_WHIP,reach:186,sp:1,dm:.95,names:{L4:'缠丝',L5:'毒蛇出洞',H:'腾蛇',AL3:'灵蛇摆尾',DA:'蛇行',AH:'蛇吞',H2:'群蛇乱舞',BC:'回首蛇',GR:'金蛇锁喉',DT:'万毒噬心',PC:'毒牙'},SP:{}})}
 };
-SCHOOLS.boss=Object.assign({},SCHOOLS.shaolin,{pm:null,wv:'wave',wvPose:'slashA',ult:{name:'魔焰火龙',sp:'firedragon',dmg:34},name:'魔教',wpn:'greatsword',wname:'焚天大剑',L:46,col:'#ff3b30',cape:'#6a0f12',scarf:'#ff3b30',hp:1.25,spd:240,armor:.2,
+SCHOOLS.boss=Object.assign({},SCHOOLS.shaolin,{pm:null,wv:'wave',wvPose:'slashA',ult:{name:'魔焰火龙',sp:'firedragon',dmg:52},name:'魔教',wpn:'greatsword',wname:'焚天大剑',L:46,col:'#ff3b30',cape:'#6a0f12',scarf:'#ff3b30',hp:1.25,spd:240,armor:.2,
  moves:buildMoves({reach:168,sp:1.02,dm:1.15,names:{L4:'焚天斩',L5:'裂地',H:'魔焰冲天',AL3:'堕魔',DA:'血影突',AH:'天崩',H2:'血狱乱斩',BC:'鬼影回斩',PC:'魔斩'},SP:{name:'魔焰滔天',sp:'firewave',dmg:34}})});
 const DEF_R={next:{L1:'L2',L2:'L3',L3:'L4',L4:'L5'},hv:{_:'H',L1:'H',L2:'H',DA:'H',BC:'H',L3:'H2',L4:'H2'},da:1,bc:1,pc:1,chase:1};SCHOOLS.boss.R=DEF_R;SCHOOLS.boss.tier=0;
 const SCH_ORDER=['shaolin','wudang','emei','gaibang','wudu'];for(const k in SCHOOLS)SCHOOLS[k].key=k;if(!SCHOOLS[SAVE.school]||SAVE.school==='boss')SAVE.school='shaolin';SAVE.el=SCHOOLS[SAVE.school].el;
@@ -261,7 +261,7 @@ const LADDER=[
  {name:'冷月师太',title:'峨眉长老',sch:'emei',d:.56,rim:'#dff4ff',cape:'#2a4a66'},
  {name:'紫电仙子',title:'武当长老',sch:'wudang',d:.66,rim:'#c48bff',cape:'#5a2a8a'},
  {name:'五毒圣使',title:'五毒护法',sch:'wudu',d:.78,rim:'#8cf04a',cape:'#2a1a3a'},
- {name:'魔教教主',title:'天下第一',sch:'boss',d:.95,rim:'#ff3b30',cape:'#6a0f12',boss:1,hpm:1.3,spDmg:34}];
+ {name:'魔教教主',title:'天下第一',sch:'boss',d:.95,rim:'#ff3b30',cape:'#6a0f12',boss:1,hpm:1.3,spDmg:52}];
 const TRAIN=[{id:'hp',name:'气血',fx:l=>'血量 +'+l*15},{id:'pow',name:'内力',fx:l=>'伤害 +'+l*6+'%'},{id:'spd',name:'身法',fx:l=>'移速 +'+l*4+'%'},{id:'luck',name:'财运',fx:l=>'铜钱 +'+l*10+'%'}];
 const TMAX=10,tcost=l=>30+20*l+12*l*l;
 
@@ -440,7 +440,7 @@ const SCH_TRIALS={
  shaolin:[{n:'三连拳',tip:TIP.chain,steps:[A_('L1'),A_('L2'),A_('L5')]},{n:'冲天炮',tip:'轻点 重（不要按住），把人打上天',steps:[H_('H')]},{n:'蓄力金刚拳',tip:'按住 重 蓄力，拳头发白「蓄满」时松开，能直接破防',steps:[H_('CP')]},{n:'拳拳冲天',tip:'攻 攻 之后接 重',steps:[A_('L1'),A_('L2'),H_('H')]},tDA('铁山靠'),{n:'千斤坠',tip:'跳起后按 重，直接垂直砸地，四周都会被震飞',steps:[T_J,H_('AH')]},tWV('烈焰掌风'),tSP],
  wudang:[{n:'四连剑',tip:TIP.chain,steps:[A_('L1'),A_('L2'),A_('L3'),A_('L5')]},{n:'太极挑剑',tip:'按 重 挑飞，'+TIP.chase,steps:[H_('H'),T_CH,A_('AL2'),A_('AL3')]},{n:'流星剑雨',tip:'攻 攻 之后接 重',steps:[A_('L1'),A_('L2'),H_('H2')]},tDA('一线天'),{n:'剑落九天',tip:'跳起后在空中按 重，悬空往下连射三道雷剑',steps:[T_J,H_('AH')]},{n:'太极反击',tip:'木人出手的瞬间按 挡，完美格挡后会自动反击',atk:1,steps:[T_PA,ST('move','PC','自动')]},tWV('雷光剑气'),tSP],
  emei:[{n:'五连刺',tip:TIP.chain,steps:[A_('L1'),A_('L2'),A_('L3'),A_('L4'),A_('L5')]},{n:'凤点头追击',tip:'攻 攻 重 挑飞，'+TIP.chase,steps:[A_('L1'),A_('L2'),H_('H'),T_CH,A_('AL2'),A_('AL3')]},{n:'千叶飞花',tip:'第三下之后按 重',steps:[A_('L1'),A_('L2'),A_('L3'),H_('H2')]},{n:'二段跳',tip:'跳起后在空中再按一次 跳',steps:[T_J,ST('djump',undefined,'跳')]},{n:'穿身背刺',tip:'冲刺穿过木人后马上按 攻，背后出手伤害 ×1.6',steps:[T_DF,A_('DA'),A_('L1')]},tBC('回风刺'),{n:'燕子点水',tip:'跳起后按 重 斜冲下刺，刺中会弹回空中，可以接着打',steps:[T_J,H_('AH')]},tPC('一刺穿心'),tWV('冰魄针'),tSP],
- gaibang:[{n:'青竹五式',tip:TIP.chain,steps:[A_('L1'),A_('L2'),A_('L3'),A_('L4'),A_('L5')]},{n:'扫地·落井下石',tip:'攻 攻 重 把人扫倒，趁他倒地按 攻 当头一棒',steps:[A_('L1'),A_('L2'),H_('L4'),A_('L5')]},{n:'挑天追击',tip:'攻 重 挑飞，'+TIP.chase,steps:[A_('L1'),H_('H'),T_CH,A_('AL2'),A_('AL3')]},{n:'棒影重重',tip:'第三下之后按 重',steps:[A_('L1'),A_('L2'),A_('L3'),H_('H2')]},tDA('飞身棒'),tBC('回马棒'),{n:'泰山压顶',tip:'跳起后按 重 砸地，地面冲击会往前滚，人借棒弹起',steps:[T_J,H_('AH')]},tPC('勾棒'),tWV('金龙破土'),tSP],
+ gaibang:[{n:'青竹五式',tip:TIP.chain,steps:[A_('L1'),A_('L2'),A_('L3'),A_('L4'),A_('L5')]},{n:'扫地·落井下石',tip:'攻 攻 重 把人扫倒，趁他倒地按 攻 当头一棒',steps:[A_('L1'),A_('L2'),H_('L4'),A_('L5')]},{n:'挑天追击',tip:'攻 重 挑飞，'+TIP.chase,steps:[A_('L1'),H_('H'),T_CH,A_('AL2'),A_('AL3')]},{n:'棒影重重',tip:'第三下之后按 重',steps:[A_('L1'),A_('L2'),A_('L3'),H_('H2')]},tDA('飞身棒'),tBC('回马棒'),{n:'泰山压顶',tip:'跳起后按 重 砸地，地面冲击会往前滚，人借棒弹起',steps:[T_J,H_('AH')]},tPC('勾棒'),{n:'回旋棒',tip:'按 波 把竹棒甩出去，飞出去打一下，转回来再打一下',sp:1,steps:[T_WV]},tSP],
  wudu:[{n:'五连鞭',tip:TIP.chain,steps:[A_('L1'),A_('L2'),A_('L3'),A_('L4'),A_('L5')]},{n:'万毒噬心',tip:'先打三下叠毒，停半秒再按 重 引爆',steps:[A_('L1'),A_('L2'),A_('L3'),H_('DT')]},{n:'金蛇锁喉',tip:'离远一点直接按 重，把人拽过来',steps:[H_('GR')]},{n:'缠丝腾蛇',tip:'攻 攻 重 缠住，再按 重 挑飞，'+TIP.chase,steps:[A_('L1'),A_('L2'),H_('L4'),H_('H'),T_CH,A_('AL2'),A_('AL3')]},{n:'群蛇乱舞',tip:'第三下之后按 重',steps:[A_('L1'),A_('L2'),A_('L3'),H_('H2')]},tDA('蛇行'),tBC('回首蛇'),{n:'蛇吞',tip:'跳起后按 重，鞭子从空中卷住远处的人拽过来砸地',steps:[T_J,H_('AH')]},tPC('毒牙'),tWV('毒液弹'),tSP]};
 const TRS=()=>SCH_TRIALS[G.trySch]||SCH_TRIALS.shaolin,TSP=()=>Math.min(22,184/TRS().length);
 function startPractice(sch,elk){G.mode='practice';G.paused=false;G.trySch=sch||SAVE.school;G.tryEl=SCHOOLS[G.trySch].el;const p=playerOpts(G.trySch,G.tryEl);PL=mkFighter('p',p.sc,p.o);
@@ -1014,7 +1014,7 @@ function opp(F){return F===PL?EN:PL;}
 function chase(F,O){F.state='air';F.t=0;F.mv=null;F.h=Math.max(F.h,1);const dh=Math.max(40,O.h+Math.max(0,O.vh)*.22+10);F.vh=clamp(Math.sqrt(2*1900*dh),520,1200);F.vx=clamp((O.x-F.x)*2.2,-720,720);F.face=sgn(O.x-F.x);F.autoAL=true;F.chainT=0;F.lastKey='';if(F===PL)practiceEv('chase');dust(F.x,0,6);sfx('whoosh');for(let i=0;i<6;i++)elPart(F.el,F.x,-rand(10,60));}
 
 function resolveHit(A,B,m,dir){if(B.ko)return false;const otg=A.sc.otg&&B.state==='down'&&!B.otgUsed&&!m.sp;if(B.inv>0&&!otg)return false;dir=dir||A.face;
- const facing=B.face===sgn(A.x-B.x);let dmg=m.dmg*A.dmgM;if(m.cp)dmg*=1+1.3*(A.chargeLv||0);const hx=B.x-dir*14,hy=-(B.h+30*VS);
+ const facing=B.face===sgn(A.x-B.x);let dmg=m.dmg*A.dmgM;if(m.cp)dmg*=1+1.0*(A.chargeLv||0);const hx=B.x-dir*14,hy=-(B.h+30*VS);
  if(B.state==='block'&&facing&&B.h<=0){
   if(B.blockT<(B.sc.parryW||.17)&&!m.sp){parry(B,A,hx,hy);return true;}
   const cost=m.cp&&A.chargeLv>.85?120:m.sp?40:m.gb?34:m.big?22:12;B.guard-=cost;B.guardCd=.8;B.en=Math.min(100,B.en+(m.big?15:9));A.en=Math.min(100,A.en+3);
@@ -1026,7 +1026,7 @@ function resolveHit(A,B,m,dir){if(B.ko)return false;const otg=A.sc.otg&&B.state=
   if(!m.sp&&!m.proj&&A.state==='act'&&A.mv&&!A.mv.plunge&&!A.mv.wave){A.state='recoil';A.t=0;A.stun=m.big?.45:.32;A.mv=null;A.trail=[];A.vx=-A.face*190;}
   fxs.push({type:'star',x:cx,y:cy,t:0,life:.14,r:46,rot:rand(0,1),col:'#ffffff'});for(let i=0;i<10;i++)spark(cx,cy,rand(-2.6,-.5)+(B.face<0?0:0),rand(220,480),i%2?'#ffe9a0':'#ffffff',rand(.15,.32));glowFx(cx,cy,60,'#fff4d0',.18);
   num(B.x+B.face*10,cy-60,'铛','#e8eefc',0);G.freeze=.07;G.shake=Math.max(G.shake,5);sfx('clank');return true;}
- B.taken=(B.taken||0)+1;dmg*=Math.max(.45,1-(B.taken-1)*.045);const wasFrozen=B.state==='frozen';if(wasFrozen&&m.big){dmg+=16*A.dmgM;B.state='hurt';shatter(B);}
+ B.taken=(B.taken||0)+1;if(!m.sp)dmg*=Math.max(.45,1-(B.taken-1)*.045);const wasFrozen=B.state==='frozen';if(wasFrozen&&m.big){dmg+=16*A.dmgM;B.state='hurt';shatter(B);}
  const back=A.sc.key==='emei'&&!facing&&!m.sp;if(back)dmg*=1.6;const crit=Math.random()<A.crit;if(A.poison>0)dmg*=.85;if(crit)dmg*=2;dmg=Math.max(1,Math.round(dmg*(1-B.armor)));
  B.hp-=dmg;if(m.sp){B.ultFx={el:A.el,t:0,life:1.9};}
  if(A.sc.key==='wudang'&&!m.sp&&!m.proj&&!(A.jyT>0)){A.jy=(A.jy||0)+1;if(A.jy>=6){A.jy=0;A.jyT=7;num(A.x,-A.h-175,'剑 意 满!','#e8f6ff',1);sfx('zap');shock(A.x,-A.h-70,120,A.el.b,.4,4);}}A.en=Math.min(100,A.en+(m.sp?4:13));B.en=Math.min(100,B.en+8);
@@ -1117,7 +1117,7 @@ function castTick(F,dt){const k=F.sc.key,el=F.el,h=wj(F,(F.sc.wpn==='sword'||F.s
  if(k==='shaolin'&&Math.random()<dt*20){const a=rand(0,6.283);flame(F.x+Math.cos(a)*95,-2+Math.sin(a)*24,0,rand(-240,-120),1.2);}}
 function detonate(F,O){if(O.ko||!(O.poison>0)||Math.abs(O.x-F.x)>460){num(F.x,-F.h-170,'没 毒','#9a9a9a',0);return;}const n=O.poison,y=-(O.h+60);O.poison=0;O.poisonT=0;
  for(let i=0;i<3;i++)zbolt(F.x,-F.h-80,O.x+rand(-20,20),y+rand(-30,30),.2,2,F.el.b);
- resolveHit(F,O,{dmg:Math.round(4+n*6),kx:260,ky:560,big:1,proj:1,stop:.15,name:'万毒噬心'},sgn(O.x-F.x)||F.face);O.poison=0;O.poisonT=0;
+ resolveHit(F,O,{dmg:Math.round(4+n*5),kx:260,ky:560,big:1,proj:1,stop:.15,name:'万毒噬心'},sgn(O.x-F.x)||F.face);O.poison=0;O.poisonT=0;
  for(let i=0;i<40;i++){const a=rand(0,6.283),v=rand(80,420);addP({k:'bubble',x:O.x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,t:0,life:rand(.5,1),sz:rand(4,10)});}shock(O.x,y,200,F.el.b,.5,8);shock(O.x,y,120,'#c070ff',.4,5);glowFx(O.x,y,160,F.el.b,.4);num(O.x,y-110,'毒 爆 ×'+n+'!','#b8ff80',1);G.shake=Math.max(G.shake,14);G.slow=Math.max(G.slow,.2);sfx('poison');sfx('big');}
 function spawnSpecial(F){const O=opp(F),m=F.mv,sp=m.sp;
  if(sp==='firebell'){projs.push({k:'fxbell',fx:1,owner:F,x:O.x,y:-190,S:190,h:0,dir:F.face,t:0,life:5,st:0,hit:false,dmg:m.dmg,name:m.name});shock(F.x,-F.h-70,120,F.el.b,.4,5);elBurst(F.el,F.x,-F.h-70,24,true);sfx('fire');sfx('gong');}
@@ -1198,6 +1198,7 @@ function fighterUpdate(F,dt){const O=opp(F),I=F.in;F.ph+=dt;ultFxUpdate(F,dt);if
    if(wk==='pwave'){projs.push({k:'pwave',owner:F,x:bx,h:bh,dir:F.face,spd:760,t:0,life:.55,hit:false,dmg:dm*1.15,name:m.name});swingFx(F,{pose:'palm',reach:150,big:1,sw:'ring'},1.2);}
    else if(wk==='needle'){for(const a of[-.14,0,.14])projs.push({k:'needle',owner:F,x:bx,h:bh,vh:Math.sin(a)*1150-(air?300:0),dir:F.face,spd:1150*Math.cos(a),t:0,life:.6,hit:false,dmg:dm*.42,name:m.name,trail:[]});swingFx(F,{pose:'cross',reach:120,sw:'jab'},1);}
    else if(wk==='quake'){projs.push({k:'quake',owner:F,x:F.x+F.face*40,h:0,dir:F.face,spd:600,t:0,life:1,hit:false,dmg:dm,name:m.name,sp:[],next:0});shock(F.x+F.face*40,0,90,F.el.b,.3,5,1);dust(F.x+F.face*40,0,8);G.shake=Math.max(G.shake,6);sfx('rock');}
+   else if(wk==='boomer'){projs.push({k:'boomer',owner:F,x:F.x+F.face*40,h:F.h+38*VS*.75,dir:F.face,spd:980,t:0,life:2,hit:false,hitB:false,back:false,dmg:dm*.6,name:m.name,trail:[],rot:0});swingFx(F,{pose:'slashA',reach:150,sw:'arc',srot:.45},1);}
    else if(wk==='venom'){const O2=opp(F),dd=clamp((O2.x-bx)*F.face,140,520),T=dd/560,vh0=(750*T*T-(bh+10))/T;projs.push({k:'venom',owner:F,x:bx,h:bh+10,vh:vh0,dir:F.face,spd:560,t:0,life:4,hit:false,dmg:dm*.8,name:m.name,trail:[],pool:0});swingFx(F,{pose:'slashB',reach:150,sw:'arc',srot:-.85},1);}
    else{projs.push({k:'wave',owner:F,x:bx,h:bh,vh:air?-520:0,dir:F.face,spd:860,t:0,life:1.1,hit:false,dmg:dm,name:m.name,trail:[]});swingFx(F,{pose:'slashA',reach:150,big:1},1.1);}elBurst(F.el,F.x+F.face*60,-F.h-70,12,true);sfx('whoosh');sfx(F.el.snd);G.kick=F.face*-5;}if(F.t>=m.dur)endAct(F);break;}
   if(!F.swung&&F.t>=m.act[0]){F.swung=true;swingFx(F,m,m.big?1.15:.8);if(m.pierce)addGhost(F,.3);if((m.qi||(F.jyT>0&&F.sc.key==='wudang'&&!m.air))&&!m.cp){projs.push({k:'wave',qi:1,owner:F,x:F.x+F.face*70,h:F.h+38*VS*.8,vh:0,dir:F.face,spd:980,t:0,life:m.qi?.42:.34,hit:false,dmg:m.dmg*F.dmgM*(m.qi?.55:.45),name:null,trail:[]});elBurst(F.el,F.x+F.face*70,-F.h-70,8,true);}if(m.blunt)G.kick=F.face*-3;}
@@ -1261,6 +1262,11 @@ function updateProjs(dt){for(const p of projs){p.t+=dt;const F=p.owner,O=opp(F);
  else if(p.k==='wave'){p.x+=p.dir*p.spd*dt;if(p.vh){p.h=Math.max(30,p.h+p.vh*dt);}p.trail.push([p.x,-p.h]);if(p.trail.length>7)p.trail.shift();for(let i=0;i<2;i++)elPart(F.el,p.x-p.dir*rand(0,30),-p.h+rand(-50,50),true);
   if(p.qi&&!p.hit&&p.t<.06&&F.hitDone&&F.state==='act'){p.hit=true;p.dead=true;}
   if(!p.hit&&Math.abs(O.x-p.x)<48&&Math.abs(O.h+50-p.h)<85){p.hit=true;p.dead=true;resolveHit(F,O,{dmg:p.dmg,kx:320,ky:O.h>0?260:0,big:1,proj:1,stop:.08,name:p.name},p.dir);shock(p.x,-p.h,90,F.el.b,.3,4);}}
+ else if(p.k==='boomer'){p.rot+=dt*26*p.dir;if(!p.back){p.x+=p.dir*p.spd*dt;p.spd-=1500*dt;if(p.spd<=0)p.back=true;}else{const tx=F.x,ty=F.h+70,dx=tx-p.x,dd=Math.abs(dx);p.spd=Math.min(1100,p.spd+2400*dt);p.x+=Math.sign(dx)*Math.min(dd,Math.abs(p.spd)*dt);p.h+=(ty-p.h)*Math.min(1,dt*6);if(dd<26&&p.t>.3){p.dead=true;sfx('swing');}}
+  p.trail.push([p.x,-p.h,p.rot]);if(p.trail.length>6)p.trail.shift();if(Math.random()<.6)addP({k:'glowp',x:p.x+rand(-20,20),y:-p.h+rand(-20,20),vx:0,vy:-40,t:0,life:.25,sz:rand(4,8),col:F.el.b});
+  const near=!O.ko&&Math.abs(O.x-p.x)<46&&Math.abs(O.h+50-p.h)<80;
+  if(near&&!p.back&&!p.hit){p.hit=true;resolveHit(F,O,{dmg:p.dmg,kx:160,ky:0,proj:1,stop:.05,name:p.name},p.dir);sfx('bonk');}
+  if(near&&p.back&&!p.hitB){p.hitB=true;resolveHit(F,O,{dmg:p.dmg,kx:-180,ky:0,proj:1,stop:.05,name:null},-p.dir);sfx('bonk');}}
  else if(p.k==='pwave'){p.x+=p.dir*p.spd*dt;p.spd*=Math.pow(.3,dt);for(let i=0;i<2;i++)flame(p.x-p.dir*rand(0,30),-p.h+rand(-70,70),p.dir*rand(40,160),rand(-130,-30),1.3);
   if(!p.hit&&Math.abs(O.x-p.x)<70&&Math.abs(O.h+50-p.h)<120&&!O.ko){p.hit=true;resolveHit(F,O,{dmg:p.dmg,kx:600,ky:O.h>0?320:180,big:1,proj:1,stop:.1,name:p.name},p.dir);shock(O.x,-p.h,130,F.el.b,.35,6);}}
  else if(p.k==='needle'){p.x+=p.dir*p.spd*dt;p.h+=p.vh*dt;p.trail.push([p.x,-p.h]);if(p.trail.length>6)p.trail.shift();if(Math.random()<.5)frost(p.x,-p.h,rand(-40,40),rand(-40,40));if(p.h<2)p.dead=true;
@@ -1517,6 +1523,9 @@ function drawProjs(){for(const p of projs){const el=p.owner.el;if(p.fx){fxDraw(p
  else if(p.k==='tiger'){const A=p.hit?Math.max(0,1-(p.t-p.dur)*3):1,k=clamp(p.t/p.dur,0,1);if(!beastSprite('tiger',p.x,-p.h-60,p.dir,310,A,p.t,null,.62,el,-Math.cos(k*Math.PI)*.28))drawBeastTiger(p.x,-p.h-32,p.dir,p.t,el,.5,A);}
  else if(p.k==='phoenix'){ctx.globalCompositeOperation='lighter';for(let i=0;i<p.trail.length;i++){const q=p.trail[i],k=i/p.trail.length;glow(q[0]-p.dir*30,q[1]+10,14+k*30,el.b,.22*k);}ctx.globalCompositeOperation='source-over';ctx.globalAlpha=1;{const A=Math.min(1,(p.life-p.t)*3);if(!beastSprite('phoenix',p.x,-p.h,p.dir,320,A,p.t,[6,4,12],.74,el,Math.sin(p.t*3)*.05))drawBeastPhoenix(p.x,-p.h,p.dir,p.t,el,.8,A);}}
  else if(p.k==='turtle')drawTurtle(p,el);
+ else if(p.k==='boomer'){const st=(x,y,r,al)=>{ctx.save();ctx.translate(x,y);ctx.rotate(r);ctx.globalAlpha=al;ctx.lineCap='round';ctx.strokeStyle='#14281c';ctx.lineWidth=6;ctx.beginPath();ctx.moveTo(-40,0);ctx.lineTo(40,0);ctx.stroke();ctx.strokeStyle='#5fd08e';ctx.lineWidth=3.4;ctx.stroke();ctx.strokeStyle='#1d3a27';ctx.lineWidth=1.4;ctx.beginPath();for(const u of[-24,-8,8,24]){ctx.moveTo(u,-3);ctx.lineTo(u,3);}ctx.stroke();ctx.restore();};
+  ctx.globalCompositeOperation='lighter';for(let i=0;i<p.trail.length;i++){const q=p.trail[i],k=(i+1)/p.trail.length;ctx.save();ctx.translate(q[0],q[1]);ctx.rotate(q[2]);ctx.globalAlpha=k*.35;ctx.strokeStyle='#7ee0a6';ctx.lineWidth=5;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(-40,0);ctx.lineTo(40,0);ctx.stroke();ctx.restore();}
+  glow(p.x,-p.h,46,el.b,.5);ctx.globalAlpha=.6;ctx.strokeStyle=el.b;ctx.lineWidth=2;ctx.beginPath();ctx.arc(p.x,-p.h,42,0,6.283);ctx.stroke();ctx.globalCompositeOperation='source-over';st(p.x,-p.h,p.rot,1);ctx.globalAlpha=1;}
  else if(p.k==='pwave'){ctx.globalCompositeOperation='lighter';ctx.lineCap='round';const k=p.t/p.life,a=1-k*.7;
   for(let i=0;i<3;i++){const R=34+i*20+k*50,x=p.x-p.dir*i*16;for(const [w,c,al] of [[12,el.c,.25],[6,el.b,.6],[2.4,el.a,.95]]){ctx.globalAlpha=a*al*(1-i*.22);ctx.strokeStyle=c;ctx.lineWidth=w;ctx.beginPath();ctx.ellipse(x-p.dir*R*.5,-p.h,R*.55,R*1.05,0,p.dir>0?-1.1:Math.PI-1.1,p.dir>0?1.1:Math.PI+1.1);ctx.stroke();}}
   glow(p.x,-p.h,90,el.b,.45*a);ctx.globalCompositeOperation='source-over';ctx.globalAlpha=1;}
