@@ -219,7 +219,7 @@ const TPL_WHIP={
  L4:{pose:'spin',sw:'arc',srot:0,dur:.42,act:[.13,.22],rk:1.05,dmg:6,kx:-110,lunge:40,stop:.07,big:1},
  L5:{fin:1,pose:'thrust',sw:'jab',sy:32,dur:.58,act:[.24,.32],rk:1.18,dmg:11,kx:600,ky:260,big:1,lunge:120,stop:.12},
  H:{pose:'rising',sw:'arc',srot:-.85,coil:1,dur:.5,act:[.16,.24],rk:1.05,dmg:10,kx:40,ky:1000,big:1,launch:1,lunge:60,stop:.12},
- AL1:TPL.AL1,AL2:TPL.AL2,AL3:TPL.AL3,AH:{pose:'airSlash',grab:1,sw:'none',dur:.62,act:[.14,.24],air:1,rk:1,dmg:8,big:1,stop:.1},
+ AL1:TPL.AL1,AL2:TPL.AL2,AL3:TPL.AL3,AH:{pose:'cWU',grab:1,sw:'none',dur:.66,act:[.16,.24],air:1,rk:1,dmg:8,big:1,stop:.1},
  DA:{pose:'thrust',sw:'jab',sy:28,dur:.44,act:[.08,.22],rk:1.05,dmg:8.5,kx:420,ky:140,big:1,lunge:780,stop:.08},
  H2:{pose:'slashA',mpose:['slashA','slashB'],sw:'arc',srot:.2,multi:[.08,.15,.22,.29,.36,.46],dur:.66,act:[.06,.48],rk:1,dmg:3.2,kx:50,lunge:40,stop:.03,fin:{kx:560,ky:380,dmg:9,stop:.12}},
  BC:{fin:1,pose:'spin',sw:'arc',srot:0,dur:.48,act:[.12,.22],rk:1.2,dmg:10,kx:420,ky:320,big:1,lunge:700,stop:.1},
@@ -766,7 +766,11 @@ function fxTurtleD(p,el){ctx.save();ctx.lineCap='round';ctx.lineJoin='round';
   if(sa>0){const fade=p.t<1.45?1:clamp(1-(p.t-1.45)/.45,0,1),A=sa*fade;if(A>0){
    ctx.save();ctx.globalCompositeOperation='lighter';for(let k=0;k<12;k++){const u=k/11,y=lerp(top+10,my-150,u),x=p.x+Math.sin(u*6+p.t*7)*12*(1-u);glow(x,y,22-u*6,el.b,.14*A);}glow(p.x,my-60,120,'#3a7a10',.35*A);glow(p.x,my-60,70,'#9a4cff',.25*A);ctx.restore();
    const W=125,H=W*XW_IMG.naturalHeight/XW_IMG.naturalWidth,bite=p.t>.53&&p.t<.72,chew=p.t>=.72&&p.t<1.45,sc=bite?1+.12*Math.sin(clamp((p.t-.53)/.12,0,1)*Math.PI):chew?1+.04*Math.sin(p.t*28):1,rise=p.t>1.45?(p.t-1.45)*-200:0,sk=bite?rand(-3,3):chew?rand(-1.5,1.5):0;
-   ctx.save();ctx.translate(p.x+sk,my+rise);ctx.scale(p.dir*sc,sc);ctx.globalCompositeOperation='source-over';ctx.globalAlpha=A*.5;ctx.drawImage(XW_IMG,-W*.5,-H*.8,W,H);ctx.globalCompositeOperation='lighter';ctx.globalAlpha=A;ctx.drawImage(XW_IMG,-W*.5,-H*.8,W,H);ctx.globalAlpha=A*.35;ctx.drawImage(XW_IMG,-W*.5,-H*.8,W,H);ctx.restore();
+   const fall=p.t<.53,sy=fall?1+.35*clamp((.53-p.t)/.4,0,1):1,iw=XW_IMG.naturalWidth,ih=XW_IMG.naturalHeight,NS=24;
+   const strip=(al,ox,oy)=>{ctx.globalAlpha=al;for(let i=0;i<NS;i++){const v=i/NS,sw2=Math.sin(p.t*7+v*7)*(1-v)*9+Math.sin(p.t*3.1+v*3)*(1-v)*4;ctx.drawImage(XW_IMG,0,v*ih,iw,ih/NS+1,-W*.5+sw2+ox,-H*.8+v*H+oy,W,H/NS+1);}};
+   ctx.save();ctx.translate(p.x+sk,my+rise);ctx.scale(p.dir*sc,sc*sy);ctx.globalCompositeOperation='lighter';
+   if(fall){strip(A*.25,0,-40);strip(A*.15,0,-80);}
+   strip(A,0,0);strip(A*.6,0,0);ctx.restore();
    if(bite){const d=p.t-.53;ctx.save();ctx.globalCompositeOperation='lighter';glow(p.x,my-6,70*(1-d*4),'#d8ffe8',Math.max(0,.6-d*4));ctx.restore();}
    ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';}}}
  ctx.restore();ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';}
@@ -1190,8 +1194,13 @@ function fighterUpdate(F,dt){const O=opp(F),I=F.in;F.ph+=dt;ultFxUpdate(F,dt);if
    const hold=F===PL&&!AUTO?(K.k||held.heavy!==undefined):F.t<(F.aiCh||.5);
    if(!hold||F.t>=1.25){const t=F.t;F.chFull=0;if(t<.2)startAct(F,'H');else{F.chargeLv=clamp((t-.2)/.8,0,1);startAct(F,'CP');}}break;}
   if(m.airq){if(F.t<.48){F.vh=20;F.vx*=Math.pow(.02,dt);}const tt=[.1,.22,.34];while(F.qiN<3&&F.t>=tt[F.qiN]){const i=F.qiN++,w=wpnWorld(F);projs.push({k:'wave',sz:.5,owner:F,x:F.x+F.face*30,h:F.h+40,vh:-560-i*90,dir:F.face,spd:640+i*60,t:0,life:.95,hit:false,dmg:m.dmg*F.dmgM,name:i===0?m.name:null,trail:[]});swingFx(F,{pose:'airSlash',reach:110,sw:'arc',srot:.9},.65);sfx('whoosh');}if(F.t>=m.dur)endAct(F);break;}
-  if(m.grab){F.vh=Math.max(F.vh,-160);F.vx*=Math.pow(.05,dt);if(!F.spDone&&F.t>=m.act[0]){F.spDone=true;const dx=(O.x-F.x)*F.face,ok=!O.ko&&O.inv<=0&&dx>-20&&dx<290&&O.h<F.h+100;const hp=wj(F,'rh'),tx=ok?O.x:F.x+F.face*270,ty=ok?-(O.h+50):0,P=[];for(let i=0;i<=14;i++){const u=i/14;P.push([hp[0]+(tx-hp[0])*u,hp[1]+(ty-hp[1])*u+Math.sin(u*Math.PI)*30]);}fxs.push({type:'lash',pts:P,col:F.el.b,core:'#e8c8ff',t:0,life:.3});sfx('crack');
-    if(ok){F.grabbed=true;resolveHit(F,O,Object.assign({},m,{kx:0,ky:0}),F.face);if(!O.ko&&O.state!=='block'){O.state='fly';O.t=0;O.bounce=0;O.mv=null;O.trail=[];O.h=Math.max(O.h,60);O.vh=520;O.vx=(F.x+F.face*70-O.x)*2.4;O.yank=1;O.spin=10;num(O.x,-O.h-140,'蛇吞','#d8b0ff',0);}}}
+  if(m.grab){F.vh=Math.max(F.vh,-160);F.vx*=Math.pow(.05,dt);
+   if(!F.spDone&&F.t>=m.act[0]){F.spDone=true;const dx=(O.x-F.x)*F.face,ok=!O.ko&&O.inv<=0&&dx>-20&&dx<300&&O.h<F.h+110;F.grabOk=ok;F.grabAt=F.t+.11;
+    fxs.push({type:'serp',F,O,ok,tx:ok?O.x:F.x+F.face*280,ty:ok?-(O.h+50):-4,t:0,life:.55,col:F.el.b});sfx('whoosh');}
+   if(F.grabAt&&F.t>=F.grabAt){F.grabAt=0;sfx('crack');
+    if(F.grabOk&&!O.ko&&O.inv<=0){F.grabbed=true;resolveHit(F,O,Object.assign({},m,{kx:0,ky:0}),F.face);
+     if(!O.ko&&O.state!=='block'){O.state='fly';O.t=0;O.bounce=0;O.mv=null;O.trail=[];O.h=Math.max(O.h,50);O.vh=640;O.vx=(F.x+F.face*80-O.x)*2.2;O.yank=1;O.yankBy=F;O.spin=11;fxs.push({type:'coil',x:O.x,t:0,life:.45,col:F.el.b,dir:F.face});num(O.x,-O.h-140,'蛇 吞!','#d8b0ff',1);for(let k2=0;k2<12;k2++)addP({k:'bubble',x:O.x,y:-(O.h+50),vx:rand(-160,160),vy:rand(-200,60),t:0,life:.5,sz:rand(3,6)});}}
+    else{const x=F.x+F.face*280;for(let k2=0;k2<10;k2++)addP({k:'bubble',x,y:-4,vx:rand(-120,120),vy:-rand(60,200),t:0,life:.5,sz:rand(3,6)});}}
    if(F.t>=m.dur)endAct(F);break;}
   if(m.dt){F.vx*=Math.pow(.01,dt);if(!F.spDone&&F.t>=m.act[0]){F.spDone=true;detonate(F,O);}if(F.t>=m.dur)endAct(F);break;}
   if(m.wave){if(F.h<=0)F.vx*=Math.pow(.001,dt);if(!F.spDone&&F.t>=m.act[0]){F.spDone=true;const air=F.h>40,wk=F.sc.wv||'wave',bx=F.x+F.face*50,bh=F.h+38*VS*.8,dm=m.dmg*F.dmgM;
@@ -1216,7 +1225,7 @@ function fighterUpdate(F,dt){const O=opp(F),I=F.in;F.ph+=dt;ultFxUpdate(F,dt);if
  if(F.h>0||F.vh>0){F.vh-=grav*dt;F.h+=F.vh*dt;
   if(F.h<=0){F.h=0;const v=F.vh;F.vh=0;
    if(F.landFx&&F.state==='fly'){const el=F.landFx;F.landFx=0;elBurst(el,F.x,-10,34,true);shock(F.x,0,180,el.b,.45,6,1);shock(F.x,-20,110,'#ffffff',.3,4);addCrack(F.x,120);dust(F.x,0,14);G.shake=Math.max(G.shake,13);sfx('thud');}
-   if(F.state==='fly'&&F.yank){F.yank=0;F.state='down';F.t=0;F.downLen=.9;F.inv=Math.max(F.inv,1);F.vx=0;F.spin=0;F.rot=-1.57;dust(F.x,0,16);addCrack(F.x,110);shock(F.x,0,140,'#8cf04a',.4,5,1);for(let i=0;i<16;i++)addP({k:'bubble',x:F.x+rand(-30,30),y:-4,vx:rand(-160,160),vy:-rand(80,240),t:0,life:rand(.4,.8),sz:rand(3,7)});F.poison=Math.min(5,(F.poison||0)+2);F.poisonT=4.5;G.shake=Math.max(G.shake,14);sfx('thud');sfx('poison');}
+   if(F.state==='fly'&&F.yank){F.yank=0;F.state='down';F.t=0;F.downLen=.9;F.inv=Math.max(F.inv,1);F.vx=0;F.spin=0;F.rot=-1.57;dust(F.x,0,18);addCrack(F.x,130);shock(F.x,0,170,'#8cf04a',.45,6,1);shock(F.x,-10,110,'#b070ff',.35,4,1);if(F.yankBy){projs.push({k:'venom',owner:F.yankBy,x:F.x,h:0,vh:0,dir:1,spd:0,t:0,pt:0,pool:1,life:2,hit:true,dmg:0,trail:[]});F.hp=Math.max(1,F.hp-Math.round(5*F.yankBy.dmgM));num(F.x,-150,'砸!','#c8ff9a',0);F.yankBy=null;}for(let i=0;i<16;i++)addP({k:'bubble',x:F.x+rand(-30,30),y:-4,vx:rand(-160,160),vy:-rand(80,240),t:0,life:rand(.4,.8),sz:rand(3,7)});F.poison=Math.min(5,(F.poison||0)+2);F.poisonT=4.5;G.shake=Math.max(G.shake,14);sfx('thud');sfx('poison');}
    else if(F.state==='fly'&&F.trip){F.trip=0;F.state='down';F.t=0;F.downLen=.85;F.inv=Math.max(F.inv,.95);F.vx=0;F.spin=0;F.rot=-1.57;dust(F.x,0,10);num(F.x,-130,'扫 倒!','#ffe08a',1);sfx('thud');}
    else if(F.state==='fly'&&F.press){F.press=0;F.state='down';F.t=0;F.downLen=1.3;F.inv=Math.max(F.inv,1.4);F.vx=0;F.spin=0;F.rot=-1.57;dust(F.x,0,18);num(F.x,-150,'镇 压!','#ffd08a',1);}
    else if(F.state==='fly'&&F.slam){const el=F.slam;F.slam=0;F.state='down';F.t=0;F.downLen=1.5;F.para=1.5;F.inv=Math.max(F.inv,1.7);F.vx=0;F.spin=0;dust(F.x,0,22);addCrack(F.x,160);shock(F.x,0,190,el.b,.5,7,1);shock(F.x,-20,120,'#ffffff',.3,4);for(let i=0;i<10;i++){const a=rand(Math.PI,2*Math.PI);zbolt(F.x,-10,F.x+Math.cos(a)*170,-10+Math.sin(a)*130,.3,2,el.b);}G.shake=Math.max(G.shake,18);G.freeze=Math.max(G.freeze,.1);sfx('thud');sfx('zap');num(F.x,-170,'麻 痹!','#bfe8ff',1);}
@@ -1464,6 +1473,16 @@ function drawFx(){ctx.globalCompositeOperation='lighter';
   else if(f.type==='cres'){ctx.save();ctx.translate(f.x,f.y);ctx.scale(f.f,1);ctx.rotate(f.rot);const R=f.r*(.9+k*.2),sw=Math.min(1,k*4),a0=-1.25,a1=a0+2.5*sw,lo=a0+2.5*Math.max(0,k*1.6-.6);
    const band=(th,col,al)=>{ctx.beginPath();ctx.arc(0,0,R,lo,a1);ctx.arc(-R*th,0,R*(1-th*.6),a1,lo,true);ctx.closePath();ctx.globalAlpha=al;ctx.fillStyle=col;ctx.fill();};
    band(.2,f.col,a*.45);band(.09,f.col,a*.8);band(.035,f.core,a);ctx.restore();ctx.globalAlpha=1;}
+  else if(f.type==='serp'&&f.F&&f.F.J){const F=f.F,h=wj(F,'rh'),tgt=f.ok&&f.O&&!f.O.ko&&f.t<.3?[f.O.x,-(f.O.h+50)]:[f.tx,f.ty],ext=Math.min(1,f.t/.11)*(f.t>.36?Math.max(0,1-(f.t-.36)/.17):1);if(ext<=0)continue;
+   const tip=[h[0]+(tgt[0]-h[0])*ext,h[1]+(tgt[1]-h[1])*ext],dx=tip[0]-h[0],dy=tip[1]-h[1],L=Math.hypot(dx,dy)||1,nx=-dy/L,ny=dx/L,N=22,P=[];
+   for(let i=0;i<=N;i++){const u=i/N,w=Math.sin(u*Math.PI*2.5-f.t*40)*12*Math.sin(u*Math.PI);P.push([h[0]+dx*u+nx*w,h[1]+dy*u+ny*w]);}
+   ctx.lineCap='round';ctx.lineJoin='round';ctx.globalCompositeOperation='lighter';ctx.globalAlpha=.4;ctx.strokeStyle='#9a4cff';ctx.lineWidth=18;ctx.beginPath();P.forEach((q,i)=>i?ctx.lineTo(q[0],q[1]):ctx.moveTo(q[0],q[1]));ctx.stroke();
+   ctx.globalCompositeOperation='source-over';for(let i=1;i<=N;i++){const u=i/N,w=4+u*7;ctx.globalAlpha=1;ctx.strokeStyle='#0c240a';ctx.lineWidth=w+3;ctx.beginPath();ctx.moveTo(P[i-1][0],P[i-1][1]);ctx.lineTo(P[i][0],P[i][1]);ctx.stroke();ctx.strokeStyle=i%2?'#3fae2a':'#2f8f22';ctx.lineWidth=w;ctx.stroke();}
+   ctx.strokeStyle='#cfff8a';ctx.lineWidth=1.2;ctx.globalAlpha=.8;ctx.beginPath();for(let i=2;i<N;i+=2){ctx.moveTo(P[i][0]-nx*2,P[i][1]-ny*2);ctx.lineTo(P[i+1][0]-nx*2,P[i+1][1]-ny*2);}ctx.stroke();
+   const a=Math.atan2(P[N][1]-P[N-2][1],P[N][0]-P[N-2][0]),jaw=f.t<.11?.7:.15;ctx.globalAlpha=1;ctx.save();ctx.translate(P[N][0],P[N][1]);ctx.rotate(a);
+   ctx.fillStyle='#2f8f22';ctx.strokeStyle='#0c240a';ctx.lineWidth=1.6;ctx.save();ctx.rotate(-jaw);ctx.beginPath();ctx.moveTo(-8,0);ctx.lineTo(4,-9);ctx.lineTo(20,-3);ctx.lineTo(18,0);ctx.closePath();ctx.fill();ctx.stroke();ctx.fillStyle='#fff';ctx.beginPath();ctx.moveTo(14,-2);ctx.lineTo(16,4);ctx.lineTo(18,-1);ctx.fill();ctx.restore();
+   ctx.save();ctx.rotate(jaw);ctx.fillStyle='#246f1a';ctx.beginPath();ctx.moveTo(-8,0);ctx.lineTo(4,8);ctx.lineTo(18,3);ctx.lineTo(16,0);ctx.closePath();ctx.fill();ctx.stroke();ctx.fillStyle='#fff';ctx.beginPath();ctx.moveTo(12,1);ctx.lineTo(14,-5);ctx.lineTo(16,1);ctx.fill();ctx.restore();
+   ctx.fillStyle='#f0c8ff';ctx.beginPath();ctx.arc(2,-5,2,0,6.283);ctx.fill();ctx.restore();ctx.globalCompositeOperation='lighter';glow(P[N][0],P[N][1],28,f.col,.7);ctx.globalAlpha=1;}
   else if(f.type==='coil'){const gr=Math.min(1,k*3.2),fd=k<.6?1:Math.max(0,1-(k-.6)/.4),n=34,P=[];for(let i=0;i<=n;i++){const u=i/n*gr,ang=u*13+f.t*16*f.dir;P.push([f.x+Math.cos(ang)*(30-u*10),-u*230,Math.sin(ang)]);}
    ctx.lineCap='round';ctx.lineJoin='round';for(let i=1;i<P.length;i++){const d=P[i][2],w=(4+9*(i/P.length))*(.8+.25*d);ctx.globalCompositeOperation='source-over';ctx.globalAlpha=fd*(d>0?.95:.5);ctx.strokeStyle='#0c240a';ctx.lineWidth=w+3;ctx.beginPath();ctx.moveTo(P[i-1][0],P[i-1][1]);ctx.lineTo(P[i][0],P[i][1]);ctx.stroke();ctx.strokeStyle=d>0?'#3fae2a':'#2a6a1c';ctx.lineWidth=w;ctx.stroke();ctx.globalCompositeOperation='lighter';ctx.globalAlpha=fd*.35;ctx.strokeStyle=i%2?f.col:'#9a4cff';ctx.lineWidth=w*2;ctx.stroke();}
    const H=P[P.length-1],Q=P[P.length-3],ha=Math.atan2(H[1]-Q[1],H[0]-Q[0]);ctx.globalCompositeOperation='source-over';ctx.globalAlpha=fd;ctx.save();ctx.translate(H[0],H[1]);ctx.rotate(ha);ctx.fillStyle='#3fae2a';ctx.strokeStyle='#0c240a';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(16,0);ctx.lineTo(-4,-9);ctx.lineTo(-8,0);ctx.lineTo(-4,9);ctx.closePath();ctx.fill();ctx.stroke();ctx.fillStyle='#f0c8ff';ctx.beginPath();ctx.arc(4,-4,1.8,0,6.283);ctx.fill();ctx.strokeStyle='#ff5a8a';ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(16,0);ctx.lineTo(23,-2);ctx.moveTo(16,0);ctx.lineTo(23,2);ctx.stroke();ctx.restore();ctx.globalCompositeOperation='lighter';glow(H[0],H[1],24,f.col,.6*fd);ctx.globalAlpha=1;}
