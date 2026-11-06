@@ -137,7 +137,7 @@ const ELS={
  bolt:{key:'bolt',name:'雷电',a:'#ffffff',b:'#6cc4ff',c:'#3a6bff',snd:'zap',eff:'麻痹',desc:'命中积累电荷，满 5 层麻痹对手，趁机白打一套',tip:'连段越长越赚',sp:{name:'雷霆猛虎',sp:'tiger',dmg:28},spd:'雷虎扑向对手，打中直接麻痹'},
  ice:{key:'ice',name:'寒冰',a:'#ffffff',b:'#9fe6ff',c:'#3f9fd8',snd:'ice',eff:'冰封',desc:'命中让对手变慢，冻满就冰封；冰封时用重击碎冰暴击',tip:'先冻住，再用重击收尾',sp:{name:'冰凤凰',sp:'phoenix',dmg:24},spd:'冰凤凰飞过全场，打中立刻冰封'},
  qi:{key:'qi',name:'剧毒',a:'#e8ffd0',b:'#8cf04a',c:'#3f8a1f',snd:'poison',eff:'中毒',desc:'命中叠毒最多 5 层，越叠掉血越快；中毒者架势不回、伤害 −15%',tip:'多打几下，让毒慢慢发作',sp:{name:'五毒玄武',sp:'turtle',dmg:22},spd:'玄武毒蛇从天咬下，留下一片毒雾'},
- gold:{key:'gold',name:'真气',a:'#fff6d0',b:'#ffc83a',c:'#c0820e',snd:'thud',eff:'龙威',desc:'命中叠龙威，满 3 层震飞对手并追加伤害',tip:'连打三下，龙威震飞',sp:{name:'降龙十八掌',sp:'golddragon',dmg:30},spd:'金龙翻滚而出，缠住对手再震飞'}};
+ gold:{key:'gold',name:'真气',a:'#fff6d0',b:'#ffc83a',c:'#c0820e',snd:'thud',eff:'龙威',desc:'命中叠龙威，满 3 层震飞对手并追加伤害',tip:'连打三下，龙威震飞',sp:{name:'金龙出海',sp:'golddragon',dmg:30},spd:'金龙翻滚而出，缠住对手再震飞'}};
 const EL_ORDER=['fire','bolt','ice','qi','gold'];ELS.gold.wave='金龙破土';ELS.fire.wave='烈焰掌风';ELS.bolt.wave='雷光剑气';ELS.ice.wave='冰魄针';ELS.qi.wave='毒液弹';if(!ELS[SAVE.el])SAVE.el='fire';
 const TPL={
  L1:{pose:'slashA',dur:.3,act:[.09,.16],rk:1,dmg:6,kx:110,lunge:120,stop:.045},
@@ -210,35 +210,37 @@ const TPL_WHIP={
  L1:{pose:'slashA',sw:'arc',srot:.45,dur:.32,act:[.1,.17],rk:1,dmg:5,kx:110,lunge:60,stop:.045},
  L2:{pose:'slashB',sw:'arc',srot:-.85,dur:.32,act:[.1,.17],rk:1,dmg:5,kx:110,lunge:60,stop:.045},
  L3:{pose:'overhead',sw:'arc',srot:1.1,dur:.36,act:[.13,.2],rk:1.05,dmg:6,kx:120,lunge:60,stop:.05},
- L4:{pose:'spin',sw:'arc',srot:0,dur:.42,act:[.13,.22],rk:1.05,dmg:6,kx:-240,ky:300,lunge:40,stop:.06},
+ L4:{pose:'spin',sw:'arc',srot:0,dur:.42,act:[.13,.22],rk:1.05,dmg:6,kx:-110,lunge:40,stop:.07,big:1},
  L5:{fin:1,pose:'thrust',sw:'jab',sy:32,dur:.58,act:[.24,.32],rk:1.18,dmg:13,kx:600,ky:260,big:1,lunge:120,stop:.12},
  H:{pose:'rising',sw:'arc',srot:-.85,dur:.5,act:[.16,.24],rk:1,dmg:9,kx:50,ky:920,big:1,launch:1,lunge:60,stop:.1},
  AL1:TPL.AL1,AL2:TPL.AL2,AL3:TPL.AL3,AH:TPL.AH,
  DA:{pose:'thrust',sw:'jab',sy:28,dur:.44,act:[.08,.22],rk:1.05,dmg:10,kx:420,ky:140,big:1,lunge:780,stop:.08},
  H2:{pose:'slashA',mpose:['slashA','slashB'],sw:'arc',srot:.2,multi:[.08,.15,.22,.29,.36,.46],dur:.66,act:[.06,.48],rk:1,dmg:3.2,kx:50,lunge:40,stop:.03,fin:{kx:560,ky:380,dmg:9,stop:.12}},
  BC:{fin:1,pose:'spin',sw:'arc',srot:0,dur:.48,act:[.12,.22],rk:1.2,dmg:13,kx:420,ky:320,big:1,lunge:700,stop:.1},
- PC:{pose:'thrust',sw:'jab',sy:32,dur:.6,act:[.06,.16],rk:1.45,dmg:18,kx:-560,big:1,lunge:200,stop:.2}};
+ GR:{pose:'thrust',sw:'jab',sy:32,dur:.6,act:[.08,.18],rk:1.45,dmg:12,kx:-560,big:1,lunge:120,stop:.16},
+ PC:{pose:'thrust',sw:'jab',sy:32,dur:.5,act:[.05,.14],rk:1.6,dmg:20,kx:300,ky:560,big:1,lunge:900,stop:.2}};
 function buildMoves(o){const M={},T0=o.tpl||TPL;for(const k in T0){const t=T0[k],m=Object.assign({},t);m.reach=Math.round(o.reach*(t.rk||1));m.dmg=t.dmg*o.dm;if(t.act&&!t.plunge){m.act=[t.act[0]*o.sp,t.act[1]*o.sp];m.dur=t.dur*o.sp;}if(t.multi)m.multi=t.multi.map(x=>x*o.sp);if(t.fin)m.fin=Object.assign({},t.fin,{dmg:t.fin.dmg*o.dm});if(o.names[k])m.name=o.names[k];M[k]=m;}
  M.SP=Object.assign({pose:'special',dur:1,act:[.5,.55],big:1},o.SP);return M;}
 const SCHOOLS={
- shaolin:{name:'少林',el:'fire',elName:'烈焰',wpn:'fist',wname:'罗汉拳',L:10,col:'#ff8a3d',cape:'#b52a22',scarf:'#ff6a2a',hp:1.15,spd:235,dashCd:.8,armor:.15,cost:0,pm:{idle:'idleFist',block:'blockFist'},wv:'pwave',wvPose:'palm',
+ shaolin:{name:'少林',el:'fire',elName:'烈焰',wpn:'fist',wname:'罗汉拳',L:10,col:'#ff8a3d',cape:'#b52a22',scarf:'#ff6a2a',hp:1.15,spd:235,dashCd:.8,armor:.15,cost:0,tier:1,pow:1,combo:'攻攻攻 · 重 · 冲刺攻 · 跳重',R:{next:{L1:'L2',L2:'L5'},hv:{_:'H',L1:'H',L2:'H',DA:'H'},da:1},pm:{idle:'idleFist',block:'blockFist'},wv:'pwave',wvPose:'palm',
   motto:'赤手空拳，拳脚刚猛，贴身硬打',passive:'金刚不坏：重招霸体，受到伤害 −15%',
   moves:buildMoves({tpl:TPL_FIST,reach:112,sp:.92,dm:1.1,names:{L4:'扫堂腿',L5:'金刚掌',H:'冲天炮',AL3:'飞龙踢',DA:'铁山靠',AH:'千斤坠',H2:'罗汉百裂拳',BC:'旋风腿',PC:'寸劲'},SP:{name:'烈焰燎原',sp:'firewave',dmg:28}})},
- wudang:{name:'武当',el:'bolt',elName:'雷电',wpn:'sword',wname:'太极剑',L:38,col:'#6cc4ff',cape:'#2556b8',scarf:'#8fd8ff',hp:1,spd:275,dashCd:.55,dashI:.34,cost:200,pm:{idle:'idleSw'},parryW:.27,
+ wudang:{name:'武当',el:'bolt',elName:'雷电',wpn:'sword',wname:'太极剑',L:38,col:'#6cc4ff',cape:'#2556b8',scarf:'#8fd8ff',hp:1,spd:275,dashCd:.55,dashI:.34,cost:250,tier:2,pow:1.1,combo:'攻×4 · 重+追击 · 攻攻重 · 冲刺攻 · 格挡反击',R:{next:{L1:'L2',L2:'L3',L3:'L5'},hv:{_:'H',L1:'H',L2:'H2',L3:'H2',DA:'H'},da:1,pc:1,chase:1},pm:{idle:'idleSw'},parryW:.27,
   motto:'点、撩、云、刺，剑走轻灵，剑气伤人',passive:'以柔克刚：完美格挡更容易，闪避无敌更长',
-  moves:buildMoves({tpl:TPL_SWORD,reach:145,sp:.86,dm:.92,names:{L4:'云剑',L5:'剑气纵横',H:'太极剑意',AL3:'雷落九天',DA:'一线天',AH:'惊雷坠',H2:'流星剑雨',BC:'回风拂柳',PC:'一剑破空'},SP:{name:'引雷诀',sp:'strikes',dmg:12}})},
- gaibang:{name:'丐帮',el:'gold',elName:'真气',wpn:'stick',wname:'打狗棒',L:54,col:'#ffd04a',cape:'#6e5226',scarf:'#c9a24a',hp:1.1,spd:250,dashCd:.75,crit:.12,cost:500,pm:{idle:'idleStk'},wv:'quake',wvPose:'chop',
-  motto:'戳、劈、缠、绊、挑、引，棒长招巧',passive:'吃百家饭：暴击率 +12%；绊、引能把人拽倒拉近',
-  moves:buildMoves({tpl:TPL_STICK,reach:162,sp:.96,dm:1,names:{L3:'缠字诀',L4:'绊字诀',L5:'棒打狗头',H:'挑字诀',AL3:'天下无狗',DA:'狗急跳墙',AH:'压肩狗背',H2:'棒影重重',BC:'转字诀',PC:'引字诀'},SP:{name:'降龙十八掌',sp:'dragon',dmg:30}})},
- emei:{name:'峨眉',el:'ice',elName:'寒冰',wpn:'spike',wname:'峨眉刺',L:10,ext:17,col:'#9fe6ff',cape:'#2f6f96',scarf:'#cfefff',hp:.95,spd:290,dashCd:.45,dashI:.3,cost:300,pm:{idle:'idleEm'},wv:'needle',wvPose:'cross',
+  moves:buildMoves({tpl:TPL_SWORD,reach:145,sp:.86,dm:.92,names:{L4:'云剑',L5:'剑气纵横',H:'太极剑意',AL3:'雷落九天',DA:'一线天',AH:'惊雷坠',H2:'流星剑雨',BC:'回身剑',PC:'一剑破空'},SP:{name:'引雷诀',sp:'strikes',dmg:12}})},
+ gaibang:{name:'丐帮',el:'gold',elName:'真气',wpn:'stick',wname:'青竹棒',L:54,col:'#ffd04a',cape:'#6e5226',scarf:'#c9a24a',hp:1.1,spd:250,dashCd:.75,crit:.12,cost:1100,tier:4,pow:1.26,combo:'攻×5 · 攻攻重扫倒→攻 · 攻重追击 · 攻攻攻重 · 前后冲刺攻 · 格挡反击',R:{next:{L1:'L2',L2:'L3',L3:'L4',L4:'L5'},hv:{_:'H',L1:'H',L2:'L4',L3:'H2',DA:'H',BC:'H'},da:1,bc:1,pc:1,chase:1},pm:{idle:'idleStk'},wv:'quake',wvPose:'chop',
+  motto:'戳、劈、缠、扫、挑、勾，棒长招巧，招式变化最多',passive:'百家饭：暴击率 +12%；扫地棒把人扫倒，勾棒把人勾过来',
+  moves:buildMoves({tpl:TPL_STICK,reach:162,sp:.96,dm:1,names:{L3:'缠棒',L4:'扫地棒',L5:'当头一棒',H:'挑天',AL3:'落棒',DA:'飞身棒',AH:'泰山压顶',H2:'棒影重重',BC:'回马棒',PC:'勾棒'},SP:{}})},
+ emei:{name:'峨眉',el:'ice',elName:'寒冰',wpn:'spike',wname:'峨眉刺',L:10,ext:17,col:'#9fe6ff',cape:'#2f6f96',scarf:'#cfefff',hp:.95,spd:290,dashCd:.45,dashI:.3,cost:600,tier:3,pow:1.18,combo:'攻×5 · 攻攻重追击 · 攻攻攻重 · 前后冲刺攻 · 格挡反击',R:{next:{L1:'L2',L2:'L3',L3:'L4',L4:'L5'},hv:{_:'H',L1:'H',L2:'H',L3:'H2',L4:'H2',DA:'H',BC:'H'},da:1,bc:1,pc:1,chase:1},pm:{idle:'idleEm'},wv:'needle',wvPose:'cross',
   motto:'双刺翻飞，出手最快，冲刺能穿身而过',passive:'轻灵：攻速最快，冲刺冷却最短',
   moves:buildMoves({tpl:TPL_SPIKE,reach:118,sp:.8,dm:.92,names:{L3:'燕旋',L5:'金顶佛光',H:'凤点头',AL3:'飞燕踢',DA:'燕子穿林',AH:'峨眉落雪',H2:'千叶飞花',BC:'回风刺',PC:'一刺穿心'},SP:{}})},
- wudu:{name:'五毒',el:'qi',elName:'剧毒',wpn:'whip',wname:'蛇鞭',L:72,col:'#c07bff',cape:'#3a1f52',scarf:'#8cf04a',hp:1,spd:245,dashCd:.7,cost:700,pm:{idle:'idleWd',block:'blockWd'},wv:'venom',wvPose:'slashB',
+ wudu:{name:'五毒',el:'qi',elName:'剧毒',wpn:'whip',wname:'蛇鞭',L:72,col:'#c07bff',cape:'#3a1f52',scarf:'#8cf04a',hp:1,spd:245,dashCd:.7,cost:1800,tier:5,pow:1.34,combo:'攻×5 · 重 隔空锁喉 · 攻攻重缠→重追击 · 攻攻攻重 · 前后冲刺攻 · 格挡反击',R:{next:{L1:'L2',L2:'L3',L3:'L4',L4:'L5'},hv:{_:'GR',L1:'H',L2:'L4',L4:'H',L3:'H2',DA:'H',BC:'H'},da:1,bc:1,pc:1,chase:1},pm:{idle:'idleWd',block:'blockWd'},wv:'venom',wvPose:'slashB',
   motto:'蛇鞭最长，抽、缠、锁，隔着老远就能下毒',passive:'五毒：毒伤翻倍；缠丝、锁喉能把人拽过来',
-  moves:buildMoves({tpl:TPL_WHIP,reach:186,sp:1,dm:.95,names:{L4:'缠丝',L5:'毒蛇出洞',H:'腾蛇',AL3:'灵蛇摆尾',DA:'蛇行',AH:'蛇吞',H2:'群蛇乱舞',BC:'回首蛇',PC:'金蛇锁喉'},SP:{}})}
+  moves:buildMoves({tpl:TPL_WHIP,reach:186,sp:1,dm:.95,names:{L4:'缠丝',L5:'毒蛇出洞',H:'腾蛇',AL3:'灵蛇摆尾',DA:'蛇行',AH:'蛇吞',H2:'群蛇乱舞',BC:'回首蛇',GR:'金蛇锁喉',PC:'毒牙'},SP:{}})}
 };
 SCHOOLS.boss=Object.assign({},SCHOOLS.shaolin,{pm:null,wv:'wave',wvPose:'slashA',ult:{name:'魔焰火龙',sp:'firedragon',dmg:34},name:'魔教',wpn:'greatsword',wname:'焚天大剑',L:46,col:'#ff3b30',cape:'#6a0f12',scarf:'#ff3b30',hp:1.25,spd:240,armor:.2,
  moves:buildMoves({reach:168,sp:1.02,dm:1.15,names:{L4:'焚天斩',L5:'裂地',H:'魔焰冲天',AL3:'堕魔',DA:'血影突',AH:'天崩',H2:'血狱乱斩',BC:'鬼影回斩',PC:'魔斩'},SP:{name:'魔焰滔天',sp:'firewave',dmg:34}})});
+const DEF_R={next:{L1:'L2',L2:'L3',L3:'L4',L4:'L5'},hv:{_:'H',L1:'H',L2:'H',DA:'H',BC:'H',L3:'H2',L4:'H2'},da:1,bc:1,pc:1,chase:1};SCHOOLS.boss.R=DEF_R;SCHOOLS.boss.tier=0;
 const SCH_ORDER=['shaolin','wudang','emei','gaibang','wudu'];for(const k in SCHOOLS)SCHOOLS[k].key=k;if(!SCHOOLS[SAVE.school]||SAVE.school==='boss')SAVE.school='shaolin';SAVE.el=SCHOOLS[SAVE.school].el;
 const NEXT={L1:'L2',L2:'L3',L3:'L4',L4:'L5',AL1:'AL2',AL2:'AL3'};
 const MOVE_HELP=[['L5','攻 ×5'],['H','攻攻 + 重'],['H2','攻攻攻 + 重'],['DA','DD 前冲 + 攻'],['BC','AA 后闪 + 攻'],['PC','完美格挡 + 攻']];
@@ -346,7 +348,7 @@ function pose(p,ph){let lean=0,bob=0,low=0,wa=-.75;
  case'liao':lean=4;re=[14,-39];rh=[22,-47];wa=-.7;le=[-6,-33];lh=[-13,-40];rf=[14,0];lf=[-12,0];break;
  case'yun_w':lean=-4;re=[-4,-40];rh=[-8,-50];wa=-2.8;le=[-6,-33];lh=[-12,-40];break;
  case'yun':lean=6;re=[14,-40];rh=[24,-46];wa=-.15;le=[-6,-34];lh=[-14,-42];rf=[16,0];lf=[-14,0];break;
- /* --- 丐帮 打狗棒 --- */
+ /* --- 丐帮 青竹棒 --- */
  case'idleStk':bob=Math.sin(ph*2)*1.4;lean=-2;lf=[-8,0];rf=[10,0];lk=[-6,-10];rk=[10,-10];re=[10,-33];rh=[18,-40];wa=1.1;le=[-3,-27];lh=[-6,-20];break;
  case'poke_w':lean=-5;re=[-4,-26];rh=[-8,-26];le=[0,-27];lh=[4,-27];wa=.1;break;
  case'poke':lean=12;re=[17,-27];rh=[30,-24];le=[8,-28];lh=[18,-26];wa=.14;rf=[20,0];rk=[16,-9];lf=[-16,0];lk=[-9,-7];break;
@@ -402,7 +404,7 @@ function mkFighter(side,sc,o){const el=ELS[o.el||sc.el||'fire'];return{waveMove:
  state:'idle',t:0,stun:0,mv:null,mvKey:'',lastKey:'',chainT:0,hitDone:false,spDone:false,inv:0,blockT:0,dashCd:0,dashRecent:0,dashDir:1,buf:null,bufT:0,ph:rand(0,9),J:null,wa:-.75,rot:0,juggle:0,bounce:0,
  trail:[],cape:mkRope(8,11,26),scarf:mkRope(6,9,7),rim:o.rim||sc.col,capeCol:o.cape||sc.cape,scarfCol:o.scarf||sc.scarf,dmgM:o.dmgM||1,spdM:o.spdM||1,armor:o.armor||0,crit:o.crit||0,name:o.name,title:o.title||'',boss:!!o.boss,ai:o.ai||null,
  in:{mx:0,block:false},ko:false,plLand:-1,runT:0,landT:0,taken:0,hurtAlt:false,autoAL:false,spiked:false,guard:100,guardCd:0,parryT:0,hitIdx:0,dashBack:false,swung:false,ghostT:0};}
-function playerOpts(sch,elk){const sc=SCHOOLS[sch||SAVE.school]||SCHOOLS.shaolin,L=SAVE.lv;elk=sc.el;return{sc,o:{el:elk,hp:Math.round(150*sc.hp+15*L.hp),dmgM:1+.06*L.pow,spdM:1+.04*L.spd,armor:sc.armor||0,crit:sc.crit||0,name:'你',title:sc.name+sc.wname+' · '+ELS[elk].name}};}
+function playerOpts(sch,elk){const sc=SCHOOLS[sch||SAVE.school]||SCHOOLS.shaolin,L=SAVE.lv;elk=sc.el;const pw=sc.pow||1;return{sc,o:{el:elk,hp:Math.round((150*sc.hp+15*L.hp)*pw),dmgM:(1+.06*L.pow)*pw,spdM:1+.04*L.spd,armor:sc.armor||0,crit:sc.crit||0,name:'你',title:sc.name+sc.wname+' · '+ELS[elk].name}};}
 function mkAI(d){return{d,react:lerp(.5,.13,d),blockP:lerp(.12,.55,d),parry:lerp(0,.28,d),dodge:lerp(.05,.18,d),aggr:lerp(.35,.75,d),chainMax:d<.2?1:d<.45?2:d<.7?3:4,t:.8,walk:0,walkDir:1,block:0,seen:false,rt:0,choice:0,chain:0,airAtk:false,dashAtk:false};}
 function enemyOpts(stage){const e=LADDER[stage],sc=SCHOOLS[e.sch],d=e.d,ng=SAVE.ng;
  return{sc,o:{el:sc.el,spName:e.spName,spDmg:e.spDmg,hp:Math.round(150*sc.hp*lerp(.8,1.55,d)*(e.hpm||1)*(1+.35*ng)),dmgM:lerp(.55,1.12,d)*(1+.15*ng),spdM:lerp(.88,1.05,d),armor:sc.armor||0,crit:sc.crit||0,name:e.name,title:e.title+' · '+ELS[sc.el].name,rim:e.rim,cape:e.cape,scarf:e.rim,boss:e.boss,ai:mkAI(Math.min(1,d+.08*ng))}};}
@@ -413,16 +415,16 @@ function startFight(){G.mode='ladder';G.paused=false;const p=playerOpts(),e=enem
  Object.assign(G,{state:'fight',intro:2.2,ko:null,cine:null,mv:null,combo:0,comboT:0,maxCombo:0,hits:0,freeze:0,slow:0,shake:0,impact:0,lineT:0,zk:1,camX:0,camY:0,z:1.1,contUsed:false,result:null});
  G.banner={top:'第 '+(SAVE.stage+1)+' 战'+(SAVE.ng?' · '+(SAVE.ng+1)+' 周目':''),main:EN.name,sub:EN.title+' · '+EN.sc.wname,t:2.2};sfx('gong');}
 const ST=(ev,k,lab)=>({ev,k,lab});
-const TRIALS=[
- {n:'五连斩',ns:{shaolin:'五连拳',wudang:'五连剑',emei:'五连刺',gaibang:'打狗五式',wudu:'五连鞭'},tip:'连按 攻，每次等光圈缩到按钮上再按',steps:[ST('move','L1','攻'),ST('move','L2','攻'),ST('move','L3','攻'),ST('move','L4','攻'),ST('move','L5','攻')]},
- {n:'挑飞追击',tip:'挑飞后马上按 攻 会自动跳上去追打',steps:[ST('move','L1','攻'),ST('move','L2','攻'),ST('move','H','重'),ST('chase',undefined,'攻'),ST('move','AL2','攻'),ST('move','AL3','攻')]},
- {n:'乱舞',ns:{shaolin:'百裂拳',wudang:'流星剑雨',emei:'千叶飞花',gaibang:'棒影重重',wudu:'群蛇乱舞'},tip:'第三下之后按 重',steps:[ST('move','L1','攻'),ST('move','L2','攻'),ST('move','L3','攻'),ST('move','H2','重')]},
- {n:'突刺',ns:{shaolin:'铁山靠',wudang:'一线天',emei:'燕子穿林',gaibang:'狗急跳墙',wudu:'蛇行'},tip:'朝木人方向快速拨两下（键盘双击 D）',steps:[ST('dashF',undefined,'→→'),ST('move','DA','攻')]},
- {n:'回身斩',ns:{shaolin:'旋风腿',wudang:'回风拂柳',emei:'回风刺',gaibang:'转字诀',wudu:'回首蛇'},tip:'背对木人方向快速拨两下（键盘双击 A）',steps:[ST('dashB',undefined,'←←'),ST('move','BC','攻')]},
- {n:'下劈',ns:{shaolin:'千斤坠',wudang:'惊雷坠',emei:'峨眉落雪',gaibang:'压肩狗背',wudu:'蛇吞'},tip:'摇杆往上划跳起，空中按 重',steps:[ST('jump',undefined,'跳'),ST('move','AH','重')]},
- {n:'一闪',ns:{shaolin:'寸劲',wudang:'一剑破空',emei:'一刺穿心',gaibang:'引字诀',wudu:'金蛇锁喉'},tip:'木人出手的瞬间按 挡，成功后按 攻',atk:1,steps:[ST('parry',undefined,'挡'),ST('move','PC','攻')]},
- {n:'雷光剑气',ns:{shaolin:'烈焰掌风',emei:'冰魄针',gaibang:'金龙破土',wudu:'毒液弹'},tip:'按 波 放出本门远程招式，每次花一格气（键盘 O）',sp:1,steps:[ST('move','WV','波')]},
- {n:'绝招',tip:'气满后按 绝',sp:1,steps:[ST('move','SP','绝')]}];
+const A_=k=>ST('move',k,'攻'),H_=k=>ST('move',k,'重'),T_J=ST('jump',undefined,'跳'),T_DF=ST('dashF',undefined,'→→'),T_DB=ST('dashB',undefined,'←←'),T_CH=ST('chase',undefined,'攻'),T_PA=ST('parry',undefined,'挡'),T_WV=ST('move','WV','波'),T_SP=ST('move','SP','绝');
+const TIP={chain:'连按 攻，每次等光圈缩到按钮上再按',df:'朝木人方向快速拨两下（键盘双击 D），再按 攻',db:'背对木人方向快速拨两下（键盘双击 A），再按 攻',jump:'摇杆往上划跳起，空中按 重',parry:'木人出手的瞬间按 挡，成功后按 攻',wv:'按 波 放出本门远程招式，每次花一格气（键盘 O）',sp:'气满后按 绝',chase:'挑飞后马上按 攻，会自动跳上去追打'};
+const tWV=n=>({n,tip:TIP.wv,sp:1,steps:[T_WV]}),tSP={n:'绝招',tip:TIP.sp,sp:1,steps:[T_SP]},tDA=n=>({n,tip:TIP.df,steps:[T_DF,A_('DA')]}),tBC=n=>({n,tip:TIP.db,steps:[T_DB,A_('BC')]}),tAH=n=>({n,tip:TIP.jump,steps:[T_J,H_('AH')]}),tPC=n=>({n,tip:TIP.parry,atk:1,steps:[T_PA,A_('PC')]});
+const SCH_TRIALS={
+ shaolin:[{n:'三连拳',tip:TIP.chain,steps:[A_('L1'),A_('L2'),A_('L5')]},{n:'冲天炮',tip:'直接按 重，把人打上天',steps:[H_('H')]},{n:'拳拳冲天',tip:'攻 攻 之后接 重',steps:[A_('L1'),A_('L2'),H_('H')]},tDA('铁山靠'),tAH('千斤坠'),tWV('烈焰掌风'),tSP],
+ wudang:[{n:'四连剑',tip:TIP.chain,steps:[A_('L1'),A_('L2'),A_('L3'),A_('L5')]},{n:'太极挑剑',tip:'按 重 挑飞，'+TIP.chase,steps:[H_('H'),T_CH,A_('AL2'),A_('AL3')]},{n:'流星剑雨',tip:'攻 攻 之后接 重',steps:[A_('L1'),A_('L2'),H_('H2')]},tDA('一线天'),tAH('惊雷坠'),tPC('一剑破空'),tWV('雷光剑气'),tSP],
+ emei:[{n:'五连刺',tip:TIP.chain,steps:[A_('L1'),A_('L2'),A_('L3'),A_('L4'),A_('L5')]},{n:'凤点头追击',tip:'攻 攻 重 挑飞，'+TIP.chase,steps:[A_('L1'),A_('L2'),H_('H'),T_CH,A_('AL2'),A_('AL3')]},{n:'千叶飞花',tip:'第三下之后按 重',steps:[A_('L1'),A_('L2'),A_('L3'),H_('H2')]},tDA('燕子穿林'),tBC('回风刺'),tAH('峨眉落雪'),tPC('一刺穿心'),tWV('冰魄针'),tSP],
+ gaibang:[{n:'青竹五式',tip:TIP.chain,steps:[A_('L1'),A_('L2'),A_('L3'),A_('L4'),A_('L5')]},{n:'扫地连击',tip:'攻 攻 重 把人扫倒，再按 攻 当头一棒',steps:[A_('L1'),A_('L2'),H_('L4'),A_('L5')]},{n:'挑天追击',tip:'攻 重 挑飞，'+TIP.chase,steps:[A_('L1'),H_('H'),T_CH,A_('AL2'),A_('AL3')]},{n:'棒影重重',tip:'第三下之后按 重',steps:[A_('L1'),A_('L2'),A_('L3'),H_('H2')]},tDA('飞身棒'),tBC('回马棒'),tAH('泰山压顶'),tPC('勾棒'),tWV('金龙破土'),tSP],
+ wudu:[{n:'五连鞭',tip:TIP.chain,steps:[A_('L1'),A_('L2'),A_('L3'),A_('L4'),A_('L5')]},{n:'金蛇锁喉',tip:'离远一点直接按 重，把人拽过来',steps:[H_('GR')]},{n:'缠丝腾蛇',tip:'攻 攻 重 缠住，再按 重 挑飞，'+TIP.chase,steps:[A_('L1'),A_('L2'),H_('L4'),H_('H'),T_CH,A_('AL2'),A_('AL3')]},{n:'群蛇乱舞',tip:'第三下之后按 重',steps:[A_('L1'),A_('L2'),A_('L3'),H_('H2')]},tDA('蛇行'),tBC('回首蛇'),tAH('蛇吞'),tPC('毒牙'),tWV('毒液弹'),tSP]};
+const TRS=()=>SCH_TRIALS[G.trySch]||SCH_TRIALS.shaolin,TSP=()=>Math.min(22,184/TRS().length);
 function startPractice(sch,elk){G.mode='practice';G.paused=false;G.trySch=sch||SAVE.school;G.tryEl=SCHOOLS[G.trySch].el;const p=playerOpts(G.trySch,G.tryEl);PL=mkFighter('p',p.sc,p.o);
  EN=mkFighter('e',SCHOOLS.shaolin,{el:'fire',hp:300,name:'木人桩',title:'练习对手',rim:'#9a8a78',cape:'#3a2e26',scarf:'#6a5a4a',ai:{dummy:1,t:1.5,walk:0}});
  parts=[];nums=[];fxs=[];rings=[];projs=[];chips=[];cracks=[];ghosts=[];pillars=[{x:-470,h:190,w:38,broken:false},{x:450,h:165,w:34,broken:false}];
@@ -430,7 +432,7 @@ function startPractice(sch,elk){G.mode='practice';G.paused=false;G.trySch=sch||S
  const s=SCHOOLS[G.trySch];G.toast={txt:'练习场 · '+s.name+s.wname+' · '+ELS[G.tryEl].name+' — 照左边的连招打',t:3};}
 function trialHit(){}
 function judge(txt,col,big){G.judge={txt,col,t:.8,big:!!big};}
-function practiceEv(type,k){if(G.mode!=='practice'||G.state!=='fight'||G.nextTrialT>0)return;const tr=TRIALS[G.trial];if(!tr)return;
+function practiceEv(type,k){if(window.__evlog)window.__evlog.push(type+':'+(k||''));if(G.mode!=='practice'||G.state!=='fight'||G.nextTrialT>0)return;const tr=TRS()[G.trial];if(!tr)return;
  if(type==='move'&&k==='AL1'&&G.tidx>0&&tr.steps[G.tidx-1].ev==='chase')return;
  const match=s=>s&&s.ev===type&&(s.k===undefined||s.k===k);
  const ok=()=>{const age=G.rt-(G.pressAt||-9),perfect=G.tidx===0||type!=='move'||age<.1;G.grades[G.tidx]=perfect?2:1;G.streak=perfect?G.streak+1:0;judge(perfect?'完 美':'不 错',perfect?'#ffe27a':'#9fd8ff');sfx(perfect?'perfect':'good');G.tidx++;G.tlast=G.rt;
@@ -479,7 +481,7 @@ cv.addEventListener('pointerdown',ev=>{ev.preventDefault();ensureAudio();G.touch
   if(R.win){if(inR(x,y,RES_BTNS.a))startFight();else if(inR(x,y,RES_BTNS.b))G.state='menu';}
   else{if(!G.contUsed&&inR(x,y,RES_BTNS.a)){G.state='ad';G.adT=2.2;}else if(inR(x,y,RES_BTNS.b))startFight();else if(inR(x,y,RES_BTNS.c))G.state='menu';}return;}
  if(G.state!=='fight')return;
- if(G.mode==='practice'){if(inR(x,y,R_EXIT)){G.state='menu';return;}if(inR(x,y,R_TRIAL_PREV)){pickTrial(Math.min(G.trial,TRIALS.length)-1);return;}if(inR(x,y,R_TRIAL_NEXT)){pickTrial(G.trial+1);return;}if(x>24&&x<274&&y>145&&y<145+TRIALS.length*22){pickTrial(Math.floor((y-145)/22));return;}if(inR(x,y,R_SW_SCH)){const tr=G.trial;const sch=SCH_ORDER[(SCH_ORDER.indexOf(G.trySch)+1)%SCH_ORDER.length];startPractice(sch);G.trial=Math.min(tr,TRIALS.length-1);sfx('up');return;}}
+ if(G.mode==='practice'){if(inR(x,y,R_EXIT)){G.state='menu';return;}if(inR(x,y,R_TRIAL_PREV)){pickTrial(Math.min(G.trial,TRS().length)-1);return;}if(inR(x,y,R_TRIAL_NEXT)){pickTrial(G.trial+1);return;}if(x>24&&x<274&&y>145&&y<145+TRS().length*TSP()){pickTrial(Math.floor((y-145)/TSP()));return;}if(inR(x,y,R_SW_SCH)){const tr=G.trial;const sch=SCH_ORDER[(SCH_ORDER.indexOf(G.trySch)+1)%SCH_ORDER.length];startPractice(sch);G.trial=Math.min(tr,TRS().length-1);sfx('up');return;}}
  else{if(G.paused){if(inR(x,y,R_PAUSE.go))G.paused=false;else if(inR(x,y,R_PAUSE.home)){G.paused=false;G.state='menu';}else if(inR(x,y,R_PAUSE.snd))setMuted(!muted);return;}
   if(inR(x,y,R_EXIT)&&!G.ko){G.paused=true;for(const k in held)delete held[k];joy.on=false;return;}}
  if(!canPlay())return;
@@ -493,12 +495,12 @@ const TAP={prev:0,dir:0,t:-9};
 function playerInput(){const I=PL.in;let mx=0;if(K.a||K.arrowleft)mx--;if(K.d||K.arrowright)mx++;
  if(joy.on){const dx=joy.x-joy.bx,dy=joy.y-joy.by;if(Math.abs(dx)>10)mx=clamp(dx/50,-1,1);if(dy<-38&&!joy.jumped){joy.jumped=true;press(PL,'jump');}if(dy>-16)joy.jumped=false;}
  I.mx=mx;if(joy.on){const dn=mx>.6?1:mx<-.6?-1:0;if(dn!==0&&TAP.prev===0)tapDir(dn);TAP.prev=dn;}else TAP.prev=0;I.block=!!(K.s||K.i||K.arrowdown||held.block!==undefined);}
-function pickTrial(i){G.trial=clamp(i,0,TRIALS.length-1);G.tidx=0;G.grades=[];G.nextTrialT=0;if(PL)PL.en=100;sfx('up');}
+function pickTrial(i){G.trial=clamp(i,0,TRS().length-1);G.tidx=0;G.grades=[];G.nextTrialT=0;if(PL)PL.en=100;sfx('up');}
 function tapDir(dn){if(TAP.dir===dn&&G.rt-TAP.t<.36){press(PL,'dash',dn);TAP.t=-9;}else{TAP.dir=dn;TAP.t=G.rt;}}
 
 /* ---------- AI ---------- */
 function aiUpdate(A,T,dt){const ai=A.ai,I=A.in;I.mx=0;I.block=false;if(G.intro>0||G.ko||A.ko)return;
- if(ai.dummy){const tr=TRIALS[G.trial];if(tr&&tr.atk&&['idle','walk'].includes(A.state)){const d=Math.abs(T.x-A.x);if(d>A.sc.moves.L1.reach-12)I.mx=sgn(T.x-A.x);else{ai.t-=dt;if(ai.t<=0){ai.t=1.7;press(A,'atk');}}}return;}
+ if(ai.dummy){const tr=TRS()[G.trial];if(tr&&tr.atk&&['idle','walk'].includes(A.state)){const d=Math.abs(T.x-A.x);if(d>A.sc.moves.L1.reach-12)I.mx=sgn(T.x-A.x);else{ai.t-=dt;if(ai.t<=0){ai.t=1.7;press(A,'atk');}}}return;}
  const dx=T.x-A.x,dist=Math.abs(dx),dir=sgn(dx),reach=A.sc.moves.L1.reach;
  const threat=T.state==='act'&&T.mv&&!T.mv.sp&&T.mv.act&&T.t<T.mv.act[0]&&dist<T.mv.reach+70;
  if(threat&&!ai.seen){ai.seen=true;ai.rt=ai.react*rand(.75,1.3);ai.choice=Math.random();}
@@ -550,7 +552,7 @@ function fxDragonU(p,F,O,dt){let hx,hy;const flame=p.gold?(x,y,vx,vy,sz)=>addP({
  if(p.st===0){p.x+=p.dir*760*dt;p.ang+=dt*12;hx=p.x;hy=-(88+Math.sin(p.ang)*50);p.dep=Math.cos(p.ang);
   if(!p.hit&&Math.abs(O.x-p.x)<70&&O.h<230){p.hit=true;
    resolveHit(F,O,{dmg:Math.round(p.dmg*.35),kx:0,ky:0,big:1,sp:1,stop:.08,name:p.name},p.dir);impact(O.x,-O.h-60,true);
-   if(O.state!=='block'&&!O.ko){p.st=1;p.ct=0;p.cx=O.x;p.cy=-O.h-85;p.a0=Math.atan2(hy-p.cy,hx-p.cx);O.state='hurt';O.t=0;O.stun=1;O.vx=0;if(p.gold){O.dmark=2;O.dmarkT=4;}else{O.burn=3;O.burnT=5;}G.slow=Math.max(G.slow,.3);G.zk=Math.max(G.zk,1.12);num(O.x,-O.h-170,p.gold?'亢 龙 有 悔!':'火 龙 缠 身!',p.gold?'#ffe08a':'#ffd08a',1);}
+   if(O.state!=='block'&&!O.ko){p.st=1;p.ct=0;p.cx=O.x;p.cy=-O.h-85;p.a0=Math.atan2(hy-p.cy,hx-p.cx);O.state='hurt';O.t=0;O.stun=1;O.vx=0;if(p.gold){O.dmark=2;O.dmarkT=4;}else{O.burn=3;O.burnT=5;}G.slow=Math.max(G.slow,.3);G.zk=Math.max(G.zk,1.12);num(O.x,-O.h-170,p.gold?'金 龙 缠 身!':'火 龙 缠 身!',p.gold?'#ffe08a':'#ffd08a',1);}
    else elBurst(F.el,O.x,-O.h-60,22,true);}
   if(Math.abs(p.x)>ARENA+120&&!p.fadeT){p.st=2;p.vx=p.dir*600;p.vy=-300;p.ex=hx;p.ey=hy;p.fadeT=p.t;p.life=p.t+.7;}}
  else if(p.st===1){p.ct+=dt;const k=Math.min(1,p.ct/.55),a=p.a0+p.dir*k*Math.PI*2.3,R=100-k*30;hx=p.cx+Math.cos(a)*R;hy=p.cy+Math.sin(a)*R*.72;p.dep=-Math.sin(a);O.vx=0;if(O.state==='hurt')O.t=0;
@@ -968,15 +970,15 @@ function tryBuffered(F){if(!F.buf)return;const a=F.buf,st=F.state,ground=F.h<=0,
  const late=st==='act'&&F.mv&&F.mv.act&&F.t>F.mv.act[1]+.02;let ok=false;
  if(a==='jump'){if(free&&ground){F.vh=780;F.h=1;F.state='air';F.t=0;ok=true;if(F===PL)practiceEv('jump');sfx('swing');dust(F.x,0,4);}}
  else if(a==='dash'){if((free||st==='air'||(late&&F.mvKey!=='SP'))&&F.dashCd<=0){F.state='dash';F.t=0;F.mv=null;F.dashDir=F.bufDir?F.bufDir:Math.abs(F.in.mx)>.2?sgn(F.in.mx):-F.face;F.dashBack=F.dashDir!==F.face;F.inv=Math.max(F.inv,(F.sc.dashI||.24)+(F.dashBack?.08:0));F.dashCd=F.sc.dashCd*(F.dashBack?.8:1);if(F.dashBack&&ground){F.vh=280;F.h=1;}if(F===PL)practiceEv(F.dashBack?'dashB':'dashF');ok=true;sfx('whoosh');if(ground)dust(F.x,0,5);}}
- else if(a==='atk'){const O=opp(F),airChain=F.chainT>0&&/^AL[12]$/.test(F.lastKey);
-  if(F.parryT>0&&(free||late)&&ground)ok=startAct(F,'PC');
+ else if(a==='atk'){const O=opp(F),RT=F.sc.R||DEF_R,airChain=F.chainT>0&&/^AL[12]$/.test(F.lastKey);
+  if(F.parryT>0&&RT.pc&&(free||late)&&ground)ok=startAct(F,'PC');
   else if(st==='air'){if(!F.autoAL)ok=startAct(F,airChain?NEXT[F.lastKey]:'AL1');}
   else if(late&&F.mv.air){if(NEXT[F.mvKey])ok=startAct(F,NEXT[F.mvKey]);}
-  else if(st==='dash'||F.dashRecent>0)ok=startAct(F,F.dashBack?'BC':'DA');
-  else if((free||(late&&!F.mv.air))&&ground&&O.state==='fly'&&!O.ko&&O.h>40&&Math.abs(O.x-F.x)<430){chase(F,O);ok=true;}
-  else if(free){ok=startAct(F,F.chainT>0&&/^L[1-4]$/.test(F.lastKey)?NEXT[F.lastKey]:'L1');}
-  else if(late&&/^L[1-4]$/.test(F.mvKey))ok=startAct(F,NEXT[F.mvKey]);}
- else if(a==='heavy'){if(st==='air'||(late&&F.mv.air))ok=startAct(F,'AH');else if(late&&/^L[34]$/.test(F.mvKey))ok=startAct(F,'H2');else if(free||(late&&/^(L[12]|DA|BC)$/.test(F.mvKey)))ok=startAct(F,'H');}
+  else if((st==='dash'||F.dashRecent>0)&&(F.dashBack?RT.bc:RT.da))ok=startAct(F,F.dashBack?'BC':'DA');
+  else if(RT.chase&&((late&&F.mvKey==='H')||(free&&F.chainT>0&&F.lastKey==='H'))&&ground&&O.state==='fly'&&!O.ko&&O.h>40&&Math.abs(O.x-F.x)<430){chase(F,O);ok=true;}
+  else if(free){ok=startAct(F,F.chainT>0&&RT.next[F.lastKey]?RT.next[F.lastKey]:'L1');}
+  else if(late&&RT.next[F.mvKey])ok=startAct(F,RT.next[F.mvKey]);}
+ else if(a==='heavy'){const RT=F.sc.R||DEF_R;if(st==='air'||(late&&F.mv.air))ok=startAct(F,'AH');else if(late&&RT.hv[F.mvKey])ok=startAct(F,RT.hv[F.mvKey]);else if(free)ok=startAct(F,RT.hv._);}
  else if(a==='special'){if(F.en>=100&&(free||st==='air'))ok=startAct(F,'SP');}
  else if(a==='wave'){if((free||st==='air'||(late&&F.mvKey!=='SP'&&F.mvKey!=='WV'))&&F.waveCd<=0){if(F.en>=20){F.en-=20;F.waveCd=.6;ok=startAct(F,'WV');}else{if(F===PL&&!F.noEnT){num(F.x,-F.h-170,'气不足','#c9b8a8',0);}ok=true;}}}
  if(ok){F.buf=null;F.bufT=0;}}
@@ -1235,7 +1237,7 @@ function ambient(rdt){
  G.skyFlash=Math.max(0,G.skyFlash-rdt);G.kick=(G.kick||0)*Math.pow(.0002,rdt);G.kickY=(G.kickY||0)*Math.pow(.0002,rdt);G.shake*=Math.pow(.0006,rdt);if(G.shake<.2)G.shake=0;
  G.zk=1+(G.zk-1)*Math.pow(G.slow>0?.4:.006,rdt);G.lineT=Math.max(0,G.lineT-rdt);G.hurtFlash=Math.max(0,(G.hurtFlash||0)-rdt);
  if(G.mv){G.mv.t-=rdt;if(G.mv.t<=0)G.mv=null;}G.trialDone=Math.max(0,(G.trialDone||0)-rdt);if(G.judge){G.judge.t-=rdt;if(G.judge.t<=0)G.judge=null;}
- if(G.mode==='practice'&&G.state==='fight'){if(G.nextTrialT>0){G.nextTrialT-=rdt;if(G.nextTrialT<=0){G.trial=Math.min(TRIALS.length,G.trial+1);G.tidx=0;G.grades=[];}}
+ if(G.mode==='practice'&&G.state==='fight'){if(G.nextTrialT>0){G.nextTrialT-=rdt;if(G.nextTrialT<=0){G.trial=Math.min(TRS().length,G.trial+1);G.tidx=0;G.grades=[];}}
   else if(G.tidx>0&&G.rt-G.tlast>1.6&&!(PL&&PL.state==='act')){judge('太慢了','#ff8a6a');sfx('miss');G.tidx=0;G.grades=[];G.streak=0;}}if(G.cine){G.cine.t-=rdt;if(G.cine.t<=0)G.cine=null;}if(G.banner){G.banner.t-=rdt;if(G.banner.t<=0)G.banner=null;}
  if(G.ko){G.ko.t+=rdt;if(G.ko.t>2.8&&G.state==='fight')endFight();}}
 
@@ -1667,14 +1669,14 @@ function drawHUD(){bar(PL,false);bar(EN,true);const P=G.mode==='practice';
  if(G.intro>0&&G.intro<.75){const k=1-G.intro/.75;ctx.save();ctx.translate(VW/2,250);const s=k<.2?2.2-k*6:1;ctx.scale(s,s);ctx.globalAlpha=Math.min(1,G.intro*4);txt('决  斗',0,0,96,'#fff0d0','center',DF,10);ctx.restore();ctx.globalAlpha=1;}
  if(G.ko&&G.ko.t>.5){const win=G.ko.winner===PL,k=G.ko.t-.5,s=k<.18?2.4-k*7.8:1;ctx.save();ctx.translate(VW/2,240);ctx.scale(s,s);ctx.globalAlpha=Math.min(1,k*5);txt(win?'胜':'败',0,0,150,win?C.gold:'#b8b0a8','center',DF,12);ctx.restore();ctx.globalAlpha=1;}}
 function drawPractice(){ghostBtn(R_EXIT,'退出',15);
- const tr=TRIALS[G.trial];const done=G.trial>=TRIALS.length;
+ const tr=TRS()[G.trial];const done=G.trial>=TRS().length;
  ctx.fillStyle='rgba(8,5,4,.72)';rr(24,112,250,226,10);ctx.fill();txt('连招谱 · '+SCHOOLS[G.trySch].name,38,130,15,PL.rim,'left',DF);txt('↑↓ 选',262,130,12,C.dim,'right',BF);
- TRIALS.forEach((t,i)=>{const y=156+i*22,ok=SAVE.trials[G.trySch+'|'+i],cur=i===G.trial;txt((ok?'✓ ':'· ')+(i+1)+'  '+((t.ns&&t.ns[G.trySch])||t.n),38,y,cur?15:13,cur?C.gold:ok?'#9fd89f':C.dim,'left',BF);});
+ TRS().forEach((t,i)=>{const y=156+i*TSP(),ok=SAVE.trials[G.trySch+'|'+i],cur=i===G.trial;txt((ok?'✓ ':'· ')+(i+1)+'  '+((t.ns&&t.ns[G.trySch])||t.n),38,y,cur?15:13,cur?C.gold:ok?'#9fd89f':C.dim,'left',BF);});
  ghostBtn(R_TRIAL_PREV,'上一个',13);ghostBtn(R_TRIAL_NEXT,'下一个',13);ghostBtn(R_SW_SCH,'换门派：'+SCHOOLS[G.trySch].name+' ›',14);
  if(done){ctx.fillStyle='rgba(8,5,4,.78)';rr(320,100,320,70,10);ctx.fill();txt('全部完成！',480,124,24,C.gold,'center',DF);txt('换个门派或属性再练练',480,152,14,C.chalk,'center',BF);}
  else{const n=tr.steps.length,sp=Math.min(78,420/Math.max(1,n-1)),x0=480-(n-1)*sp/2,ly=150;
   const bw=Math.max((n-1)*sp+120,400);ctx.fillStyle='rgba(8,5,4,.7)';rr(480-bw/2,92,bw,104,12);ctx.fill();
-  txt((G.trial+1)+' / '+TRIALS.length+'  '+((tr.ns&&tr.ns[G.trySch])||tr.n),480,108,18,C.chalk,'center',DF,3);
+  txt((G.trial+1)+' / '+TRS().length+'  '+((tr.ns&&tr.ns[G.trySch])||tr.n),480,108,18,C.chalk,'center',DF,3);
   for(let i=0;i<n;i++){const st=tr.steps[i],x=x0+i*sp,done2=i<G.tidx,cur=i===G.tidx&&G.nextTrialT<=0,g=G.grades[i];
    if(i>0){txt('›',x-sp/2,ly,22,done2?PL.el.b:C.dim,'center',BF);}
    const r=24;if(cur){ctx.globalCompositeOperation='lighter';glow(x,ly,r*2,PL.el.b,.35+.2*Math.sin(G.rt*10));ctx.globalCompositeOperation='source-over';ctx.globalAlpha=1;}
@@ -1727,15 +1729,16 @@ function drawLadder(){panelBG();txt('江湖榜',24,44,36,C.chalk,'left',DF);txt(
   txt(done?'已击败':cur?'当前':'未挑战',x+430,y+33,14,cur?C.gold:C.dim,'right',BF);});
  ghostBtn(R_BACK,'返回');button(R_CHALLENGE,'挑战 '+LADDER[SAVE.stage].name,SCHOOLS[SAVE.school].col,'#140c08',18);}
 function wrapTxt(str,x,y,maxW,lh,size,col){ctx.font=size+'px '+BF;let line='',yy=y;for(const ch of str){if(ctx.measureText(line+ch).width>maxW){txt(line,x,yy,size,col,'left',BF);line=ch;yy+=lh;}else line+=ch;}if(line)txt(line,x,yy,size,col,'left',BF);}
-function drawSchool(){panelBG();txt('门派',24,40,32,C.chalk,'left',DF);txt('每个门派有自己的兵器、连招、属性和绝招',96,44,13,C.dim,'left',BF);coinLine(VW-24,40,'right');
+function drawSchool(){panelBG();txt('门派',24,40,32,C.chalk,'left',DF);txt('越贵的门派越强，招式也越多；每派兵器、连招、属性、绝招都不同',96,44,13,C.dim,'left',BF);coinLine(VW-24,40,'right');
  SCH_ORDER.forEach((id,i)=>{const sc=SCHOOLS[id],e=ELS[sc.el],r=schoolR(i),own=!!SAVE.unlocked[id],cur=SAVE.school===id,view=G.view===id,x=r[0]+14;
   rr(r[0],r[1],r[2],r[3],12);ctx.fillStyle=cur?'#2c211c':C.card;ctx.fill();ctx.strokeStyle=cur?sc.col:view?C.dim:C.line;ctx.lineWidth=cur?2.6:1.2;ctx.stroke();
   ctx.globalCompositeOperation='lighter';glow(r[0]+r[2]-34,r[1]+32,26,e.b,cur?.55:.3);ctx.globalCompositeOperation='source-over';ctx.globalAlpha=1;
-  txt(sc.name,x,r[1]+32,30,sc.col,'left');txt(sc.wname,x,r[1]+62,15,sc.col,'left',BF);
+  txt(sc.name,x,r[1]+32,30,sc.col,'left');txt(sc.wname,x,r[1]+62,15,sc.col,'left',BF);txt('★'.repeat(sc.tier)+'☆'.repeat(5-sc.tier),r[0]+r[2]-12,r[1]+62,12,C.gold,'right',BF);
   txt(e.name+' · '+e.eff,x,r[1]+88,13,e.b,'left',BF);
   txt('绝招',x,r[1]+116,11,C.dim,'left',BF);txt((sc.ult||e.sp).name,x,r[1]+138,18,C.gold,'left',DF);
-  wrapTxt(sc.motto,x,r[1]+170,r[2]-26,18,12,C.chalk);
-  wrapTxt(sc.passive,x,r[1]+246,r[2]-26,17,11,C.dim);
+  wrapTxt(sc.motto,x,r[1]+166,r[2]-26,17,12,C.chalk);
+  wrapTxt(sc.passive+(sc.pow>1?'；伤害、血量 +'+Math.round((sc.pow-1)*100)+'%':''),x,r[1]+222,r[2]-26,16,11,C.dim);
+  wrapTxt('招式：'+sc.combo,x,r[1]+276,r[2]-26,15,11,'#c9b48a');
   const by=r[1]+r[3]-46;
   if(cur)txt('使用中',x,by+17,15,sc.col,'left',BF);else if(own)txt('点击使用',x,by+17,14,C.dim,'left',BF);
   else{const ub=[x-2,by,r[2]-24,34];rr(ub[0],ub[1],ub[2],ub[3],8);ctx.fillStyle=SAVE.coins>=sc.cost?C.gold:'#3a2e28';ctx.fill();coin(ub[0]+20,ub[1]+17,6);txt(sc.cost+' 解锁',ub[0]+ub[2]/2+10,ub[1]+18,14,SAVE.coins>=sc.cost?'#140c08':C.dim,'center',BF);}});
@@ -1774,7 +1777,7 @@ function frame(now){const rdt=Math.min(.033,Math.max(0,(now-last)/1000));last=no
  else if(G.state==='ad'){G.adT-=rdt;if(G.adT<=0)continueFight();}
  else if(G.state==='menu')updateMenu(rdt);else fx(rdt);
  render();requestAnimationFrame(frame);}
-window.__dbg={G,SAVE,log:[],get projs(){return projs;},get PL(){return PL;},get EN(){return EN;}};
+window.__trs=()=>TRS();window.__dbg={G,SAVE,log:[],get projs(){return projs;},get PL(){return PL;},get EN(){return EN;}};
 if(AUTO){setTimeout(()=>startFight(),300);setInterval(()=>{if(G.state==='result'){window.__dbg.log.push({stage:G.result.stage,win:G.result.win,t:Math.round(G.t)});startFight();}},1200);}
 requestAnimationFrame(frame);
 })();
