@@ -484,7 +484,7 @@ const inR=(x,y,b)=>x>=b[0]&&x<=b[0]+b[2]&&y>=b[1]&&y<=b[1]+b[3];
 const R_MUTE=[466,60,30,24],R_MUTE_M=[906,18,36,26];
 const M_BTNS={start:[600,150,320,66],prac:[600,226,320,50],school:[600,286,320,50],train:[600,346,156,46],ladder:[764,346,156,46]};
 const R_PAUSE={go:[380,210,200,54],home:[380,276,200,48],snd:[380,336,200,42]};
-const R_EXIT=[430,58,100,30],R_TRIAL_PREV=[24,348,74,30],R_TRIAL_NEXT=[106,348,74,30],R_SW_SCH=[290,58,126,30],R_SW_EL=[544,58,126,30];
+const R_EXIT=[430,58,100,30],R_SW_SCH=[290,58,126,30],R_SW_EL=[544,58,126,30];
 const R_BACK=[24,476,150,46],R_CHALLENGE=[740,476,196,46];
 const RES_BTNS={a:[330,330,300,58],b:[330,398,300,50],c:[330,458,300,46]};
 const schoolR=i=>[24+i*184,78,176,374],elR=i=>[24+i*231,286,223,148],trainR=i=>[24+(i%2)*460,110+(i>>1)*120,452,108];
@@ -508,7 +508,7 @@ cv.addEventListener('pointerdown',ev=>{ev.preventDefault();ensureAudio();G.touch
   if(R.win){if(inR(x,y,RES_BTNS.a))startFight();else if(inR(x,y,RES_BTNS.b))G.state='menu';}
   else{if(!G.contUsed&&inR(x,y,RES_BTNS.a)){G.state='ad';G.adT=2.2;}else if(inR(x,y,RES_BTNS.b))startFight();else if(inR(x,y,RES_BTNS.c))G.state='menu';}return;}
  if(G.state!=='fight')return;
- if(G.mode==='practice'){if(inR(x,y,R_EXIT)){G.state='menu';return;}if(inR(x,y,R_TRIAL_PREV)){pickTrial(Math.min(G.trial,TRS().length)-1);return;}if(inR(x,y,R_TRIAL_NEXT)){pickTrial(G.trial+1);return;}if(x>24&&x<274&&y>145&&y<145+TRS().length*TSP()){pickTrial(Math.floor((y-145)/TSP()));return;}if(inR(x,y,R_SW_SCH)){const tr=G.trial;const sch=SCH_ORDER[(SCH_ORDER.indexOf(G.trySch)+1)%SCH_ORDER.length];startPractice(sch);G.trial=Math.min(tr,TRS().length-1);sfx('up');return;}}
+ if(G.mode==='practice'){if(inR(x,y,R_EXIT)){G.state='menu';return;}if(x>24&&x<274&&y>145&&y<145+TRS().length*TSP()){pickTrial(Math.floor((y-145)/TSP()));return;}if(inR(x,y,R_SW_SCH)){const tr=G.trial;const sch=SCH_ORDER[(SCH_ORDER.indexOf(G.trySch)+1)%SCH_ORDER.length];startPractice(sch);G.trial=Math.min(tr,TRS().length-1);sfx('up');return;}}
  else{if(G.paused){if(inR(x,y,R_PAUSE.go))G.paused=false;else if(inR(x,y,R_PAUSE.home)){G.paused=false;G.state='menu';}else if(inR(x,y,R_PAUSE.snd))setMuted(!muted);return;}
   if(inR(x,y,R_EXIT)&&!G.ko){G.paused=true;for(const k in held)delete held[k];joy.on=false;return;}}
  if(!canPlay())return;
@@ -1875,9 +1875,9 @@ function drawHUD(){bar(PL,false);bar(EN,true);const P=G.mode==='practice';
  if(G.ko&&G.ko.t>.5){const win=G.ko.winner===PL,k=G.ko.t-.5,s=k<.18?2.4-k*7.8:1;ctx.save();ctx.translate(VW/2,240);ctx.scale(s,s);ctx.globalAlpha=Math.min(1,k*5);txt(win?'胜':'败',0,0,150,win?C.gold:'#b8b0a8','center',DF,12);ctx.restore();ctx.globalAlpha=1;}}
 function drawPractice(){ghostBtn(R_EXIT,'退出',15);
  const tr=TRS()[G.trial];const done=G.trial>=TRS().length;
- ctx.fillStyle='rgba(8,5,4,.72)';rr(24,112,250,226,10);ctx.fill();txt('连招谱 · '+SCHOOLS[G.trySch].name,38,130,15,PL.rim,'left',DF);txt('↑↓ 选',262,130,12,C.dim,'right',BF);
+ ctx.fillStyle='rgba(8,5,4,.72)';rr(24,112,250,226,10);ctx.fill();txt('连招谱 · '+SCHOOLS[G.trySch].name,38,130,15,PL.rim,'left',DF);txt(TOUCHDEV?'点一行切换':'点选 / ↑↓',262,130,12,C.dim,'right',BF);
  TRS().forEach((t,i)=>{const y=156+i*TSP(),ok=SAVE.trials[G.trySch+'|'+i],cur=i===G.trial;txt((ok?'✓ ':'· ')+(i+1)+'  '+((t.ns&&t.ns[G.trySch])||t.n),38,y,cur?15:13,cur?C.gold:ok?'#9fd89f':C.dim,'left',BF);});
- ghostBtn(R_TRIAL_PREV,'上一个',13);ghostBtn(R_TRIAL_NEXT,'下一个',13);ghostBtn(R_SW_SCH,'换门派：'+SCHOOLS[G.trySch].name+' ›',14);
+ ghostBtn(R_SW_SCH,'换门派：'+SCHOOLS[G.trySch].name+' ›',14);
  if(done){ctx.fillStyle='rgba(8,5,4,.78)';rr(320,100,320,70,10);ctx.fill();txt('全部完成！',480,124,24,C.gold,'center',DF);txt('换个门派或属性再练练',480,152,14,C.chalk,'center',BF);}
  else{const n=tr.steps.length,sp=Math.min(78,420/Math.max(1,n-1)),x0=480-(n-1)*sp/2,ly=150;
   const bw=Math.max((n-1)*sp+120,400);ctx.fillStyle='rgba(8,5,4,.7)';rr(480-bw/2,92,bw,104,12);ctx.fill();
@@ -1892,7 +1892,7 @@ function drawPractice(){ghostBtn(R_EXIT,'退出',15);
   txt(tr.tip,480,214,14,C.dim,'center',BF,3);
   if(G.streak>=2)txt('完美 ×'+G.streak,480+bw/2-14,108,14,'#ffe27a','right',DF,3);}
  if(G.judge){const k=1-G.judge.t/.8,s=k<.15?1.6-k*4:1;ctx.save();ctx.translate(480,G.judge.big?270:250);ctx.scale(s,s);ctx.globalAlpha=Math.min(1,G.judge.t*3);txt(G.judge.txt,0,0,G.judge.big?56:40,G.judge.col,'center',DF,7);ctx.restore();ctx.globalAlpha=1;}
- txt('键盘：A D 移动（双击冲/闪）· W 跳 · J 攻 · K 重 · S 挡 · O 波 · U 绝',VW/2,VH-12,11,C.dim,'center',BF,3);}
+ if(!TOUCHDEV)txt('键盘：A D 移动（双击冲/闪）· W 跳 · J 攻 · K 重 · S 挡 · O 波 · U 绝',VW/2,VH-12,11,C.dim,'center',BF,3);}
 const BXO=b=>b.x+(b.x>480?EX*.92:-EX*.92);
 function drawControls(){if(AUTO)return;ctx.globalAlpha=.9;
  const bx=joy.on?joy.bx:130-EX*.92,by=joy.on?joy.by:420;ctx.strokeStyle='rgba(239,230,216,.22)';ctx.lineWidth=2;ctx.beginPath();ctx.arc(bx,by,56,0,6.283);ctx.stroke();
