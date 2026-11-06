@@ -254,7 +254,7 @@ function playerOpts(sch){const sc=SCHOOLS[sch||SAVE.school]||SCHOOLS.shaolin,L=S
 function mkAI(d){return{d,react:lerp(.5,.13,d),blockP:lerp(.12,.55,d),parry:lerp(0,.28,d),dodge:lerp(.05,.18,d),aggr:lerp(.35,.75,d),chainMax:d<.2?1:d<.45?2:d<.7?3:4,t:.8,walk:0,walkDir:1,block:0,seen:false,rt:0,choice:0,chain:0,airAtk:false,dashAtk:false};}
 function enemyOpts(stage){const e=LADDER[stage],sc=SCHOOLS[e.sch],d=e.d,ng=SAVE.ng;
  return{sc,o:{el:e.el,spName:e.spName,spDmg:e.spDmg,hp:Math.round(100*sc.hp*lerp(.8,1.55,d)*(e.hpm||1)*(1+.35*ng)),dmgM:lerp(.55,1.12,d)*(1+.15*ng),spdM:lerp(.88,1.05,d),armor:sc.armor||0,crit:sc.crit||0,name:e.name,title:e.title+' · '+ELS[e.el].name,rim:e.rim,cape:e.cape,scarf:e.rim,boss:e.boss,ai:mkAI(Math.min(1,d+.08*ng))}};}
-function startFight(){G.mode='ladder';const p=playerOpts(),e=enemyOpts(SAVE.stage);PL=mkFighter('p',p.sc,p.o);EN=mkFighter('e',e.sc,e.o);
+function startFight(){G.mode='ladder';G.paused=false;const p=playerOpts(),e=enemyOpts(SAVE.stage);PL=mkFighter('p',p.sc,p.o);EN=mkFighter('e',e.sc,e.o);
  if(AUTO)PL.ai=mkAI(.75);
  parts=[];nums=[];fxs=[];rings=[];projs=[];chips=[];cracks=[];ghosts=[];
  pillars=[{x:-470,h:190,w:38,broken:false},{x:450,h:165,w:34,broken:false}];
@@ -270,7 +270,7 @@ const TRIALS=[
  {n:'下劈',tip:'摇杆往上划跳起，空中按 重',steps:[ST('jump',undefined,'跳'),ST('move','AH','重')]},
  {n:'一闪',tip:'木人出手的瞬间按 挡，成功后按 攻',atk:1,steps:[ST('parry',undefined,'挡'),ST('move','PC','攻')]},
  {n:'绝招',tip:'气满后按 绝',sp:1,steps:[ST('move','SP','绝')]}];
-function startPractice(sch){G.mode='practice';G.trySch=sch||SAVE.school;const p=playerOpts(G.trySch);PL=mkFighter('p',p.sc,p.o);
+function startPractice(sch){G.mode='practice';G.paused=false;G.trySch=sch||SAVE.school;const p=playerOpts(G.trySch);PL=mkFighter('p',p.sc,p.o);
  EN=mkFighter('e',SCHOOLS.shaolin,{el:'fire',hp:300,name:'木人桩',title:'练习对手',rim:'#9a8a78',cape:'#3a2e26',scarf:'#6a5a4a',ai:{dummy:1,t:1.5,walk:0}});
  parts=[];nums=[];fxs=[];rings=[];projs=[];chips=[];cracks=[];ghosts=[];pillars=[{x:-470,h:190,w:38,broken:false},{x:450,h:165,w:34,broken:false}];
  Object.assign(G,{state:'fight',intro:0,ko:null,cine:null,mv:null,combo:0,comboT:0,maxCombo:0,hits:0,freeze:0,slow:0,shake:0,impact:0,lineT:0,zk:1,camX:0,camY:0,z:1.1,trial:0,tidx:0,grades:[],streak:0,judge:null,banner:null,nextTrialT:0});
@@ -289,17 +289,19 @@ function practiceEv(type,k){if(G.mode!=='practice'||G.state!=='fight'||G.nextTri
 const K={},held={};const joy={on:false,id:null,bx:0,by:0,x:0,y:0,jumped:false};
 const BTN=[{id:'atk',x:858,y:438,r:54,label:'攻'},{id:'heavy',x:742,y:482,r:40,label:'重'},{id:'block',x:752,y:366,r:38,label:'挡'},{id:'special',x:868,y:308,r:36,label:'绝'}];
 function press(F,a,dir){if(!F)return;F.buf=a;F.bufT=.45;F.bufDir=dir||0;if(F===PL)G.pressAt=G.rt;}
-const canPlay=()=>G.state==='fight'&&G.intro<=0&&!G.ko&&!AUTO;
+const canPlay=()=>G.state==='fight'&&G.intro<=0&&!G.ko&&!AUTO&&!G.paused;
 window.addEventListener('keydown',e=>{const k=e.key.toLowerCase();if(['arrowup','arrowdown','arrowleft','arrowright',' '].includes(k))e.preventDefault();K[k]=true;if(e.repeat)return;ensureAudio();
  if(canPlay()){if(k==='a'||k==='arrowleft')tapDir(-1);else if(k==='d'||k==='arrowright')tapDir(1);if(k==='j')press(PL,'atk');else if(k==='k')press(PL,'heavy');else if(k==='l')press(PL,'dash');else if(k==='u')press(PL,'special');else if(k==='w'||k===' '||k==='arrowup')press(PL,'jump');}
  else if(k==='enter'&&G.state==='menu')startFight();
- else if(k==='escape'&&['school','train','ladder'].includes(G.state))G.state='menu';});
+ else if(k==='escape'&&['school','train','ladder'].includes(G.state))G.state='menu';
+ if(k==='escape'&&G.state==='fight'){if(G.mode==='practice')G.state='menu';else if(!G.ko)G.paused=!G.paused;}});
 window.addEventListener('keyup',e=>{K[e.key.toLowerCase()]=false;});
 window.addEventListener('blur',()=>{for(const k in K)K[k]=false;});
 function toV(ev){const r=cv.getBoundingClientRect();return[(ev.clientX-r.left-ox)/scale,(ev.clientY-r.top-oy)/scale];}
 const inR=(x,y,b)=>x>=b[0]&&x<=b[0]+b[2]&&y>=b[1]&&y<=b[1]+b[3];
 const R_MUTE=[466,60,30,24],R_MUTE_M=[906,18,36,26];
 const M_BTNS={start:[600,150,320,66],prac:[600,226,320,50],school:[600,286,320,50],train:[600,346,156,46],ladder:[764,346,156,46]};
+const R_PAUSE={go:[380,210,200,54],home:[380,276,200,48],snd:[380,336,200,42]};
 const R_EXIT=[430,58,100,30],R_TRIAL_PREV=[24,348,74,30],R_TRIAL_NEXT=[106,348,74,30];
 const R_BACK=[24,476,150,46],R_CHALLENGE=[740,476,196,46];
 const RES_BTNS={a:[330,330,300,58],b:[330,398,300,50],c:[330,458,300,46]};
@@ -326,7 +328,8 @@ cv.addEventListener('pointerdown',ev=>{ev.preventDefault();ensureAudio();G.touch
   else{if(!G.contUsed&&inR(x,y,RES_BTNS.a)){G.state='ad';G.adT=2.2;}else if(inR(x,y,RES_BTNS.b))startFight();else if(inR(x,y,RES_BTNS.c))G.state='menu';}return;}
  if(G.state!=='fight')return;
  if(G.mode==='practice'){if(inR(x,y,R_EXIT)){G.state='menu';return;}if(inR(x,y,R_TRIAL_PREV)){G.trial=Math.max(0,G.trial-1);G.tidx=0;G.grades=[];return;}if(inR(x,y,R_TRIAL_NEXT)){G.trial=Math.min(TRIALS.length-1,G.trial+1);G.tidx=0;G.grades=[];return;}}
- else if(inR(x,y,R_MUTE)){setMuted(!muted);return;}
+ else{if(G.paused){if(inR(x,y,R_PAUSE.go))G.paused=false;else if(inR(x,y,R_PAUSE.home)){G.paused=false;G.state='menu';}else if(inR(x,y,R_PAUSE.snd))setMuted(!muted);return;}
+  if(inR(x,y,R_EXIT)&&!G.ko){G.paused=true;for(const k in held)delete held[k];joy.on=false;return;}}
  if(!canPlay())return;
  for(const b of BTN)if(Math.hypot(x-b.x,y-b.y)<b.r+12){held[b.id]=ev.pointerId;if(b.id!=='block')press(PL,b.id);try{cv.setPointerCapture(ev.pointerId);}catch(e){}return;}
  if(x<460&&y>150&&!joy.on){joy.on=true;joy.id=ev.pointerId;joy.bx=x;joy.by=y;joy.x=x;joy.y=y;joy.jumped=false;try{cv.setPointerCapture(ev.pointerId);}catch(e){}}
@@ -745,7 +748,7 @@ function bar(F,right){const W=360,x=right?VW-24-W:24,y=24;
  const st=[];if(F.state==='frozen')st.push(['冰封','#dff8ff']);if(F.para>0)st.push(['麻痹','#bfe8ff']);if(F.burn>0)st.push(['灼烧×'+F.burn,'#ff9a50']);if(F.shock>0)st.push(['电荷 '+F.shock+'/5','#8fd0ff']);if(F.chill>0&&F.state!=='frozen')st.push(['冻伤 '+Math.round(F.chill)+'%','#9fe6ff']);
  let cx=right?VW-24:24;for(const[t,c]of st){const w=ctxW(t,14)*.92+16;const bx=right?cx-w:cx;rr(bx,y+72,w,22,11);ctx.fillStyle='rgba(0,0,0,.55)';ctx.fill();ctx.strokeStyle=c;ctx.lineWidth=1.2;ctx.stroke();txt(t,bx+w/2,y+83.5,14,c,'center',BF);cx+=right?-(w+6):w+6;}}
 function drawHUD(){bar(PL,false);bar(EN,true);const P=G.mode==='practice';
- if(P){drawPractice();}else{txt('第 '+(SAVE.stage+1)+' 战',VW/2,30,16,C.chalk,'center',DF,4);rr(R_MUTE[0],R_MUTE[1],R_MUTE[2],R_MUTE[3],6);ctx.fillStyle='rgba(255,255,255,.08)';ctx.fill();txt(muted?'静':'声',R_MUTE[0]+15,R_MUTE[1]+12.5,13,C.dim,'center',BF);}
+ if(P){drawPractice();}else{txt('第 '+(SAVE.stage+1)+' 战',VW/2,30,16,C.chalk,'center',DF,4);ghostBtn(R_EXIT,'暂停 / 退出',13);}
  if(G.combo>=2){const cx=P?VW-150:150;const rk=G.combo>=30?'天下无双':G.combo>=20?'华丽':G.combo>=12?'漂亮':G.combo>=6?'不错':'连击';txt(G.combo+' 段',cx,P?150:150,48,G.combo>=12?C.red:C.gold,'center',DF,7);txt(rk,cx,P?184:184,G.combo>=12?22:15,G.combo>=12?PL.el.a:C.chalk,'center',DF,4);}
  if(G.mv&&!G.cine&&!P){const k=1-G.mv.t,sc=k<.12?1.7-k*5.8:1,right=G.mv.F.side==='e',P2=G.mode==='practice',x=P2?480:right?VW-190:190,y=P2?222:226;ctx.save();ctx.translate(x,y);ctx.scale(sc,sc);ctx.globalAlpha=Math.min(1,G.mv.t*3);
   ctx.fillStyle='rgba(8,5,4,.78)';ctx.beginPath();ctx.moveTo(-110,-22);ctx.lineTo(116,-26);ctx.lineTo(108,22);ctx.lineTo(-116,24);ctx.closePath();ctx.fill();ctx.fillStyle=G.mv.F.el.b;ctx.fillRect(-116,20,224,3);
@@ -806,7 +809,7 @@ function drawMenu(){ensureMenu();drawScene([MP,ME]);
  rr(M_BTNS.start[0],M_BTNS.start[1],M_BTNS.start[2],M_BTNS.start[3],10);ctx.fillStyle=sc.col;ctx.fill();
  txt('闯 江 湖',M_BTNS.start[0]+M_BTNS.start[2]/2,M_BTNS.start[1]+26,26,'#140c08');txt('第 '+(SAVE.stage+1)+' 战 · 对手 '+e.name+(SAVE.ng?' · '+(SAVE.ng+1)+' 周目':''),M_BTNS.start[0]+M_BTNS.start[2]/2,M_BTNS.start[1]+52,13,'#2a1408','center',BF);
  ghostBtn(M_BTNS.prac,'练习场 · 学连招');ghostBtn(M_BTNS.school,'门派 · 属性：'+sc.name+sc.wname+' · '+ELS[SAVE.el].name);ghostBtn(M_BTNS.train,'练功房');ghostBtn(M_BTNS.ladder,'江湖榜');
- coinLine(600,416,'left');txt('原型 v0.7 · 存档只在本浏览器 · 广告位为演示',600,444,12,C.dim,'left',BF,3);
+ coinLine(600,416,'left');txt('原型 v0.7.1 · 存档只在本浏览器 · 广告位为演示',600,444,12,C.dim,'left',BF,3);
  rr(R_MUTE_M[0],R_MUTE_M[1],R_MUTE_M[2],R_MUTE_M[3],6);ctx.fillStyle='rgba(255,255,255,.08)';ctx.fill();txt(muted?'静':'声',R_MUTE_M[0]+18,R_MUTE_M[1]+13.5,14,C.dim,'center',BF);
  txt('你 · '+sc.name+sc.wname,130,500,15,MP.rim,'center',DF,4);txt('下一个对手 · '+e.name,440,500,15,ME.rim,'center',DF,4);}
 function panelBG(){if(!BGL)buildBG();ctx.drawImage(BGL.sky,0,0,VW,VH);ctx.fillStyle='rgba(8,5,4,.82)';ctx.fillRect(0,0,VW,VH);}
@@ -852,14 +855,15 @@ function render(){ctx.setTransform(1,0,0,1,0,0);ctx.fillStyle=C.bg;ctx.fillRect(
  ctx.setTransform(dpr*scale,0,0,dpr*scale,dpr*ox,dpr*oy);ctx.save();ctx.beginPath();ctx.rect(0,0,VW,VH);ctx.clip();
  if(G.state==='menu')drawMenu();
  else if(G.state==='ladder')drawLadder();else if(G.state==='school')drawSchool();else if(G.state==='train')drawTrain();
- else{drawScene([PL,EN]);if(G.state==='fight'){drawHUD();drawControls();}else if(G.state==='result')drawResult();else if(G.state==='ad')drawAd();}
+ else{drawScene([PL,EN]);if(G.state==='fight'){drawHUD();drawControls();if(G.paused){ctx.fillStyle='rgba(8,5,4,.78)';ctx.fillRect(0,0,VW,VH);txt('暂 停',VW/2,150,56,C.chalk,'center',DF,6);button(R_PAUSE.go,'继续战斗',PL.rim,'#140c08',20);ghostBtn(R_PAUSE.home,'回大厅（本场不算）',16);ghostBtn(R_PAUSE.snd,muted?'声音：关':'声音：开',15);}}else if(G.state==='result')drawResult();else if(G.state==='ad')drawAd();}
  if(portrait&&!G.portraitOK)drawPortrait();
  ctx.restore();}
 
 resize();
 let last=performance.now();
 function frame(now){const rdt=Math.min(.033,Math.max(0,(now-last)/1000));last=now;G.rt+=rdt;ambient(rdt);
- if(G.state==='fight'){const ts=G.slow>0?.3:1;if(G.slow>0)G.slow=Math.max(0,G.slow-rdt);update(rdt*ts);}
+ if(G.state==='fight'&&G.paused){}
+ else if(G.state==='fight'){const ts=G.slow>0?.3:1;if(G.slow>0)G.slow=Math.max(0,G.slow-rdt);update(rdt*ts);}
  else if(G.state==='ad'){G.adT-=rdt;if(G.adT<=0)continueFight();}
  else if(G.state==='menu')updateMenu(rdt);else fx(rdt);
  render();requestAnimationFrame(frame);}
