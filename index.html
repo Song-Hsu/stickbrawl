@@ -416,6 +416,17 @@ function blendTo(o,T,rate,dt){if(!o.J){o.J={};o.JV={};for(const k of JK){o.J[k]=
  const J=o.J;ik2(J.N,J.le,J.lh,blen(T.N,T.le),blen(T.le,T.lh));ik2(J.N,J.re,J.rh,blen(T.N,T.re),blen(T.re,T.rh));
  ik2(J.H,J.lk,J.lf,blen(T.H,T.lk),blen(T.lk,T.lf));ik2(J.H,J.rk,J.rf,blen(T.H,T.rk),blen(T.rk,T.rf));
  const a=1-Math.exp(-rate*dt);let d=((T.wa-o.wa+Math.PI)%(2*Math.PI)+2*Math.PI)%(2*Math.PI)-Math.PI;o.wa+=d*a;}
+// three-stage keyframes derived from each move's own windup/strike pair:
+//  w: anticipation - the windup pulled further away from the strike, body sinks and leans back
+//  s: follow-through - the strike pushed past itself, weight thrown forward
+//  r: recovery - strike eased part-way back toward the guard before returning to idle
+const KPF={lf:.25,rf:.25,lk:.45,rk:.45,H:.6};
+function keyPose(F,T,mode,base,PM){const out={wa:T.wa};
+ if(mode==='r'){const I=pose(PM(F.h>0?'fall':'idle'),F.ph);for(const k of JK)out[k]=[T[k][0]+(I[k][0]-T[k][0])*.38,T[k][1]+(I[k][1]-T[k][1])*.38];return out;}
+ const O=pose(PM(mode==='w'?base:base+'_w'),F.ph),e=mode==='w'?(F.t<(F.mv.act[0]||.2)*.55?.18:.3):.17;
+ for(const k of JK){const f=e*(KPF[k]||1);out[k]=[T[k][0]+(T[k][0]-O[k][0])*f,T[k][1]+(T[k][1]-O[k][1])*f];}
+ const lean=mode==='w'?-1.6:2.2,sink=mode==='w'?1.6:.6;for(const k of ['N','D','H'])out[k]=[out[k][0]+lean*(k==='D'?1.3:k==='H'?.4:1),out[k][1]+sink];
+ let dw=((T.wa-O.wa+Math.PI)%(2*Math.PI)+2*Math.PI)%(2*Math.PI)-Math.PI;out.wa=T.wa+dw*e*.8;return out;}
 function poseKick(F,dir,mag){if(!F.JV)return;const f=dir*F.face,r=()=>rand(-1,1);const K={N:[150,-40],D:[230,-70],H:[60,0],lh:[90+60*r(),-120],rh:[90+60*r(),-120],le:[80,-60],re:[80,-60]};
  for(const k in K){F.JV[k][0]+=K[k][0]*f*mag;F.JV[k][1]+=K[k][1]*mag;}}
 const wj=(F,k)=>[F.x+F.J[k][0]*VS*F.face,-F.h+F.J[k][1]*VS];
@@ -1174,8 +1185,8 @@ function spawnSpecial(F){const O=opp(F),m=F.mv,sp=m.sp;
 function fighterTarget(F){const st=F.state;
  if(st==='idle')return['idle',22];if(st==='walk')return[F.running?'run':'walk',22];if(st==='land')return['land',40];if(st==='block')return['block',30];
  if(st==='air')return[F.vh>0?'air':'fall',18];if(st==='dash')return[F.dashBack?'backstep':'dash',40];if(st==='recoil')return['stagger',40];
- if(st==='act'){const m=F.mv;if(m.plunge)return F.plLand>=0?['land',40]:F.t<.2?[m.dw||'diveW',30]:[m.ds||'diveS',70];if(m.sp)return[F.t<m.act[0]?'special_w':'special',F.t<m.act[0]?30:60];if(m.multi){if(F.t<m.multi[0]*.8)return[(m.mpose?m.mpose[0]:'slashA')+'_w',30];if(F.t>m.dur*.8)return['idle',22];return[m.mpose?m.mpose[F.hitIdx%m.mpose.length]:(F.hitIdx%2?'slashA':'slashB'),75];}const p=m.pose;
-  if(F.t<m.act[0]*.9)return[p+'_w',28];if(F.t>m.dur*.78)return[F.h>0?'fall':'idle',22];return[p,95];}
+ if(st==='act'){const m=F.mv;if(m.plunge)return F.plLand>=0?['land',40]:F.t<.2?[m.dw||'diveW',30]:[m.ds||'diveS',70];if(m.sp)return F.t<m.act[0]?['special_w',F.t<m.act[0]*.6?26:40,'w','special']:F.t<=m.act[1]+.08?['special',70,'s','special']:['special',16,'r','special'];if(m.multi){if(F.t<m.multi[0]*.8)return[(m.mpose?m.mpose[0]:'slashA')+'_w',30];if(F.t>m.dur*.8)return['idle',22];return[m.mpose?m.mpose[F.hitIdx%m.mpose.length]:(F.hitIdx%2?'slashA':'slashB'),75];}const p=m.pose;
+  if(F.t<m.act[0]*.9)return[p+'_w',F.t<m.act[0]*.55?26:42,'w',p];if(F.t>m.dur*.78)return[F.h>0?'fall':'idle',22];if(F.t<=m.act[1]+.07)return[p,110,'s',p];return[p,15,'r',p];}
  if(st==='hurt')return[F.hurtAlt?'hurt2':'hurt',45];if(st==='fly'||st==='down'||st==='ko')return['hurt',38];if(st==='stagger')return['stagger',30];if(st==='getup')return['idle',16];if(st==='win')return['victory',10];return['idle',20];}
 
 function bodyPts(F){const lay=['down','ko','getup'].includes(F.state)||Math.abs(F.rot)>.9,o=[];for(let i=0;i<5;i++){const u=i/4;o.push(lay?[F.x+(u-.5)*110,-F.h-12-Math.sin(u*Math.PI)*10]:[F.x+Math.sin(u*3+F.ph)*4,-F.h-12-u*128]);}return o;}
@@ -1273,7 +1284,7 @@ function fighterUpdate(F,dt){const O=opp(F),I=F.in;F.ph+=dt;ultFxUpdate(F,dt);if
  F.x+=F.vx*dt;
  if(F.x<-ARENA||F.x>ARENA){const s=sgn(F.x);F.x=s*ARENA;if(F.state==='fly'&&Math.abs(F.vx)>380&&sgn(F.vx)===s){F.vx*=-.35;dust(F.x,-F.h,10);G.shake=Math.max(G.shake,8);sfx('thud');shock(F.x,-F.h-40,50,'#ffffff',.25,3);if(!F.ko)F.hp=Math.max(1,F.hp-4);}else F.vx=0;}
  if(F.state==='fly'&&Math.abs(F.vx)>260)for(const p of pillars){if(!p.broken&&Math.abs(F.x-p.x)<p.w/2+14&&F.h<p.h){breakPillar(p,sgn(F.vx));F.vx*=.5;if(!F.ko)F.hp=Math.max(1,F.hp-5);}}
- if(F.state!=='frozen'){const[tp,rate]=fighterTarget(F),T=pose((F.sc.pm&&F.sc.pm[tp])||tp,F.ph);if(F.state==='idle'||F.state==='block'){const b=Math.sin(F.ph*2.3),b2=Math.sin(F.ph*2.3-.7);T.N=[T.N[0]+b*.35,T.N[1]-b*.9];T.D=[T.D[0]+b2*.45,T.D[1]-b2*1.1];for(const k of ['lh','rh','le','re'])T[k]=[T[k][0]+b2*.4,T[k][1]-b2*(k[1]==='h'?1.3:.8)];}if(F.state==='walk'||F.state==='idle'){const lf=clamp(F.vx*F.face*.006,-3.5,3.5);T.N=[T.N[0]+lf,T.N[1]];T.D=[T.D[0]+lf*1.3,T.D[1]];}if(F.sc.wpn==='whip'&&F.state!=='act')T.wa=1.35;blendTo(F,T,rate,dt);}
+ if(F.state!=='frozen'){const[tp,rate,mode,base]=fighterTarget(F),PM=n=>(F.sc.pm&&F.sc.pm[n])||n;let T=pose(PM(tp),F.ph);if(mode)T=keyPose(F,T,mode,base,PM);if(F.state==='idle'||F.state==='block'){const b=Math.sin(F.ph*2.3),b2=Math.sin(F.ph*2.3-.7);T.N=[T.N[0]+b*.35,T.N[1]-b*.9];T.D=[T.D[0]+b2*.45,T.D[1]-b2*1.1];for(const k of ['lh','rh','le','re'])T[k]=[T[k][0]+b2*.4,T[k][1]-b2*(k[1]==='h'?1.3:.8)];}if(F.state==='walk'||F.state==='idle'){const lf=clamp(F.vx*F.face*.006,-3.5,3.5);T.N=[T.N[0]+lf,T.N[1]];T.D=[T.D[0]+lf*1.3,T.D[1]];}if(F.sc.wpn==='whip'&&F.state!=='act')T.wa=1.35;blendTo(F,T,rate,dt);}
  if(F.sc.wpn==='whip'){if(F.wlag==null)F.wlag=F.wa;let d=((F.wa-F.wlag+Math.PI)%(2*Math.PI)+2*Math.PI)%(2*Math.PI)-Math.PI;F.wlag+=d*(1-Math.exp(-9*dt));}
  if(F.dmarkT>0){F.dmarkT-=dt;if(F.dmarkT<=0)F.dmark=0;}
  const w=wpnWorld(F);
