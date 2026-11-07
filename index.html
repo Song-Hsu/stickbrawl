@@ -1038,7 +1038,7 @@ function swingFx(F,m,sz){const p=m.pose,up=/slashB|rising|airSlashB/.test(p)?1:0
  fxs.push({type:'cres',x:F.x+F.face*m.reach*.38,y,f:F.face,rot,r:m.reach*.62*sz,col:F.el.b,core:F.el.a,t:0,life:m.big?.26:.18});}
 function ichimonji(F,O){const y=-(O.h+34*VS);fxs.push({type:'sline',x:(F.x+O.x)/2,y,t:0,life:.5,col:F.el.a});impact(O.x,y,true);G.freeze=Math.max(G.freeze,.22);G.slow=.5;num((F.x+O.x)/2,y-90,'一 闪',F.el.a,1);for(let i=0;i<24;i++)spark(O.x,y,rand(-.4,.4)+(F.face>0?0:Math.PI),rand(300,800),'#ffffff',rand(.2,.4));}
 
-function startAct(F,key){const m=key==='SP'?F.spMove:key==='WV'?F.waveMove:F.sc.moves[key];if(!m)return false;if(F===PL&&key!=='CH')practiceEv('move',key);if(key==='CH'){F.aiCh=rand(.1,1.1);F.chFull=0;}if(key==='AH')F.ahUsed=true;F.state='act';F.mv=m;F.mvKey=key;F.t=0;F.hitDone=false;F.dived=false;F.spDone=false;F.trail=[];F.plLand=-1;F.hitIdx=0;F.swung=false;F.rbDone=false;F.qiN=0;F.grabbed=false;if(key==='PC')F.parryT=0;
+function startAct(F,key){const m=key==='SP'?F.spMove:key==='WV'?F.waveMove:F.sc.moves[key];if(!m)return false;if(F===PL&&key!=='CH')practiceEv('move',key);if(key==='CH'){F.aiCh=rand(.1,1.1);F.chFull=0;}if(key==='AH')F.ahUsed=true;F.state='act';F.mv=m;F.mvKey=key;F.t=0;F.armHit=false;F.actId=(F.actId||0)+1;F.hitDone=false;F.dived=false;F.spDone=false;F.trail=[];F.plLand=-1;F.hitIdx=0;F.swung=false;F.rbDone=false;F.qiN=0;F.grabbed=false;if(key==='PC')F.parryT=0;
  if(key==='SP'){F.en=0;G.cine={t:1,name:m.name,F};fxs.push({type:'cast',k:F.sc.key,F,t:0,life:1.55,col:F.el.b,core:F.el.a,c:F.el.c});fxs.push({type:'sigil',k:F.sc.key,F,x:F.x,t:0,life:1.7,col:F.el.b,core:F.el.a,c:F.el.c});G.freeze=Math.max(G.freeze,1);sfx('whoosh');sfx(F.el.snd);}
  else if(m.name)G.mv={txt:m.name,t:1,F};
  if(m.plunge){F.vh=Math.max(F.vh,380);F.h=Math.max(F.h,1);}
@@ -1068,6 +1068,10 @@ function opp(F){return F===PL?EN:PL;}
 function chase(F,O){F.state='air';F.t=0;F.mv=null;F.h=Math.max(F.h,1);const dh=Math.max(40,O.h+Math.max(0,O.vh)*.22+10);F.vh=clamp(Math.sqrt(2*1900*dh),520,1200);F.vx=clamp((O.x-F.x)*2.2,-720,720);F.face=sgn(O.x-F.x);F.autoAL=true;F.chainT=0;F.lastKey='';if(F===PL)practiceEv('chase');dust(F.x,0,6);sfx('whoosh');for(let i=0;i<6;i++)elPart(F.el,F.x,-rand(10,60));}
 
 function resolveHit(A,B,m,dir){if(B.ko)return false;const otg=A.sc.otg&&B.state==='down'&&!B.otgUsed&&!m.sp;if(B.inv>0&&!otg)return false;dir=dir||A.face;
+ // anti-infinite: a defender held in hitstun too long (9 hits or 3s without getting to act) breaks out - brief invulnerability and the attacker is shoved back
+ {const stunned=B.state==='hurt'||B.state==='stagger'||B.state==='fly'||B.state==='down'||B.state==='frozen';if(!stunned||!B.chainT0){B.chainN=0;B.chainT0=G.rt;B.chainAct=-1;}const aid=A.actId*2+(A===PL?1:0);if(B.chainAct!==aid){B.chainAct=aid;B.chainN++;}
+  if(!m.sp&&G.mode!=='practice'&&(B.chainN>7||G.rt-B.chainT0>3.2)){B.chainN=0;B.chainT0=0;B.inv=.7;B.state=B.h>0?'air':'idle';B.t=0;B.mv=null;B.vx=-dir*120;A.vx=dir*-620;if(A.state==='act'){A.state=A.h>0?'air':'idle';A.mv=null;}
+   num(B.x,-(B.h+120),'破 招','#ffffff',0);shock(B.x,-(B.h+40),120,B.rim||'#ffffff',.35,6);G.shake=Math.max(G.shake,6);sfx('whoosh');return false;}}
  const facing=B.face===sgn(A.x-B.x);let dmg=m.dmg*A.dmgM;if(m.cp)dmg*=1+1.0*(A.chargeLv||0);const hx=B.x-dir*14,hy=-(B.h+30*VS);
  if(B.state==='block'&&facing&&B.h<=0){
   if(B.blockT<(B.sc.parryW||.17)&&!m.sp){parry(B,A,hx,hy);return true;}
@@ -1098,7 +1102,7 @@ function resolveHit(A,B,m,dir){if(B.ko)return false;const otg=A.sc.otg&&B.state=
  if(B.hp<=0&&EN===B&&G.mode==='practice')B.hp=B.maxHp;
  if(B.hp<=0){B.hp=0;B.mv=null;B.trail=[];KO(A,B,dir,hx,hy);return true;}
  if(B.state==='act'&&B.mvKey==='SP'&&B.mv&&B.mv.act&&B.t<=B.mv.act[1]+.05){num(B.x,hy-110,'霸 体','#ffd890',0);fxs.push({type:'star',x:B.x,y:hy,t:0,life:.16,r:80,rot:rand(0,1),col:'#ffd890'});shock(B.x,hy,90,'#ffd890',.25,4);applyEl(A,B,m);if(B===PL)G.hurtFlash=.2;return true;}
- if(B.state==='act'&&B.mv&&B.mv.armor&&!m.sp&&!m.launch&&!(m.air&&m.spike)&&!wasFrozen){num(B.x,hy-110,'霸 体','#ffd890',0);fxs.push({type:'star',x:B.x,y:hy,t:0,life:.16,r:80,rot:rand(0,1),col:'#ffd890'});shock(B.x,hy,90,'#ffd890',.25,4);B.vx+=dir*40;applyEl(A,B,m);if(B===PL)G.hurtFlash=.2;return true;}
+ if(B.state==='act'&&B.mv&&B.mv.armor&&!B.armHit&&(B.mv.charge||B.t<=B.mv.act[1]+.05)&&!m.sp&&!m.launch&&!(m.air&&m.spike)&&!wasFrozen){B.armHit=true;num(B.x,hy-110,'霸 体','#ffd890',0);fxs.push({type:'star',x:B.x,y:hy,t:0,life:.16,r:80,rot:rand(0,1),col:'#ffd890'});shock(B.x,hy,90,'#ffd890',.25,4);B.vx+=dir*40;applyEl(A,B,m);if(B===PL)G.hurtFlash=.2;return true;}
  if(wasFrozen&&!m.big){B.vx=dir*30;applyEl(A,B,m);return true;}
  if(otg){B.otgUsed=true;B.state='fly';B.t=0;B.bounce=0;B.h=Math.max(B.h,1);B.vh=560;B.vx=dir*140;B.mv=null;B.trail=[];B.inv=0;num(B.x,hy-110,'落井下石!','#ffe08a',1);addCrack(B.x,100);shock(B.x,0,130,A.el.b,.35,5,1);G.shake=Math.max(G.shake,10);applyEl(A,B,m);return true;}
  if(m.trip&&B.h<=0&&B.state!=='down'){B.state='fly';B.t=0;B.bounce=0;B.h=4;B.vh=-200;B.vx=dir*40;B.trip=1;B.mv=null;B.trail=[];applyEl(A,B,m);return true;}
